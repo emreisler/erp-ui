@@ -1,93 +1,98 @@
-import React, {useEffect, useState} from "react";
-import {LoginUserRequest, LoginUserResponse} from "../types/auth";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { LoginUserRequest, LoginUserResponse } from "../types/auth";
+import { useNavigate } from "react-router-dom";
 import useAuthAxios from "../utils/authApi";
-import {useAuth} from "./hooks/Auth";
+import { useAuth } from "./hooks/Auth";
+import { Form, Input, Button, Typography, Alert, Spin } from "antd";
+
+const { Title } = Typography;
 
 interface Props {
     setAuthToken: (token: string) => void;
 }
 
-const LoginPage: React.FC<Props> = ({setAuthToken}) => {
-    const [email, setEmail] = useState<string>("admin@example.com");
-    const [password, setPassword] = useState<string>("admin123");
+const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [error, setError] = useState<string>("");
 
     const api = useAuthAxios();
 
-    // Validate token in localStorage on component mount
     useEffect(() => {
         const validateToken = async () => {
             const token = localStorage.getItem("authToken");
-            console.log("validateToken", token);
             if (token) {
                 try {
-                    // Call the /validate endpoint to check token validity
-                    api.get("/auth/validate", {
+                    await api.get("/auth/validate", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     });
-                    // If the token is valid, navigate to the dashboard
                     navigate("/app");
-                    console.log("token validated");
-                } catch (error) {
-                    console.error("Token validation failed:", error);
-                    localStorage.removeItem("authToken"); // Remove invalid token
+                } catch (err) {
+                    console.error("Token validation failed:", err);
+                    localStorage.removeItem("authToken");
                 }
             }
         };
         validateToken();
     }, [navigate]);
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogin = async (values: LoginUserRequest) => {
         setError("");
-
-        const requestBody: LoginUserRequest = {
-            email,
-            password,
-        };
+        setLoading(true);
 
         try {
-            const response = await api.post<LoginUserResponse>("/auth/login", requestBody);
-            const {token} = response.data;
-            console.log(token);
-            login(response.data.token);
-            // Redirect to dashboard
+            const response = await api.post<LoginUserResponse>("/auth/login", values);
+            const { token } = response.data;
+            login(token);
             navigate("/app");
         } catch (err) {
             setError("Invalid username or password");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px"}}>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Username:</label>
-                    <input
-                        type="text"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                {error && <p style={{color: "red"}}>{error}</p>}
-                <button type="submit">Login</button>
-            </form>
+        <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
+            <Title level={2} style={{ textAlign: "center" }}>
+                Login
+            </Title>
+            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+            <Form
+                layout="vertical"
+                onFinish={handleLogin}
+                initialValues={{
+                    email: "admin@example.com",
+                    password: "admin123",
+                }}
+            >
+                <Form.Item
+                    label="Email"
+                    name="email"
+                    rules={[
+                        { required: true, message: "Please input your email!" },
+                        { type: "email", message: "Please enter a valid email!" },
+                    ]}
+                >
+                    <Input placeholder="Enter your email" />
+                </Form.Item>
+                <Form.Item
+                    label="Password"
+                    name="password"
+                    rules={[{ required: true, message: "Please input your password!" }]}
+                >
+                    <Input.Password placeholder="Enter your password" />
+                </Form.Item>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading} block>
+                        Login
+                    </Button>
+                </Form.Item>
+            </Form>
+            {loading && <Spin tip="Validating login..." style={{ display: "block", marginTop: 16 }} />}
         </div>
     );
 };

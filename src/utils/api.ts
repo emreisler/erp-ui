@@ -1,12 +1,19 @@
-import axios from "axios";
+import axios, {AxiosInstance} from "axios";
 import {useError} from "../context/ErrorContext";
 import {useAuth} from "../components/hooks/Auth";
 
 
+let api: AxiosInstance | null = null;
+
 const useAxios = () => {
-    const { logout } = useAuth();
+
+    const {logout} = useAuth();
     const {setError} = useError();
-    const api = axios.create({
+
+    if (api) {
+        return api;
+    }
+    api = axios.create({
         baseURL: "http://localhost:8080/v1",
     });
 

@@ -1,26 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import useAxios from "../../utils/api";
 import { Form, Input, Button, Typography, Alert, Select, Spin } from "antd";
 
 const { Title } = Typography;
 const { Option } = Select;
 
-
-
 interface CreatePartFormProps {
     onPartCreated: (part: Part) => void; // Callback for when part is created
 }
 
-const CreatePart: React.FC<CreatePartFormProps> = ({onPartCreated}) => {
+const CreatePart: React.FC<CreatePartFormProps> = ({ onPartCreated }) => {
     const [form] = Form.useForm();
-    const [number, setNumber] = useState("");
-    const [name, setName] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [fetchingData, setFetchingData] = useState<boolean>(true);
-
 
     const api = useAxios();
 
@@ -41,13 +36,13 @@ const CreatePart: React.FC<CreatePartFormProps> = ({onPartCreated}) => {
         };
 
         fetchData();
-    },[]);
+    }, [api]);
 
-    const handleCreatePart = async () => {
+    const handleCreatePart = async (part: Part) => {
         setError(null);
         setLoading(true);
         try {
-            const response = await api.post("/parts", {number, name});
+            const response = await api.post("part", part);
             const createdPart = response.data; // Assuming backend returns created part ID
             onPartCreated(createdPart); // Pass partId to parent or EditPartComponent
             form.resetFields();
@@ -59,40 +54,40 @@ const CreatePart: React.FC<CreatePartFormProps> = ({onPartCreated}) => {
     };
 
     return (
-        <div style={{maxWidth: 400, margin: "0 auto", padding: "20px"}}>
+        <div style={{ maxWidth: 400, margin: "0 auto", padding: "20px" }}>
             <Title level={3}>Create Part</Title>
-            {error && <Alert message={error} type="error" showIcon style={{marginBottom: 16}}/>}
+            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
             {fetchingData ? (
-                <Spin tip="Loading projects and categories..."/>
+                <Spin tip="Loading projects and categories..." />
             ) : (
                 <Form
                     form={form}
                     layout="vertical"
-                    onFinish={handleCreatePart}
+                    onFinish={handleCreatePart} // Form automatically passes values to this function
                     requiredMark="optional"
                 >
                     <Form.Item
                         label="Part Number"
                         name="number"
-                        rules={[{required: true, message: "Please input the part number!"}]}
+                        rules={[{ required: true, message: "Please input the part number!" }]}
                     >
-                        <Input placeholder="Enter part number"/>
+                        <Input placeholder="Enter part number" />
                     </Form.Item>
                     <Form.Item
                         label="Part Name"
                         name="name"
-                        rules={[{required: true, message: "Please input the part name!"}]}
+                        rules={[{ required: true, message: "Please input the part name!" }]}
                     >
-                        <Input placeholder="Enter part name"/>
+                        <Input placeholder="Enter part name" />
                     </Form.Item>
                     <Form.Item
                         label="Project"
-                        name="project"
-                        rules={[{required: true, message: "Please select a project!"}]}
+                        name="projectCode"
+                        rules={[{ required: true, message: "Please select a project!" }]}
                     >
                         <Select placeholder="Select a project">
-                            {projects.map((project, index) => (
-                                <Option key={index} value= {project.code}>
+                            {projects.map((project) => (
+                                <Option key={project.code} value={project.code}>
                                     {project.name}
                                 </Option>
                             ))}
@@ -101,11 +96,11 @@ const CreatePart: React.FC<CreatePartFormProps> = ({onPartCreated}) => {
                     <Form.Item
                         label="Category"
                         name="category"
-                        rules={[{required: true, message: "Please select a category!"}]}
+                        rules={[{ required: true, message: "Please select a category!" }]}
                     >
                         <Select placeholder="Select a category">
-                            {categories.map((category, index) => (
-                                <Option key={index} value={category.type}>
+                            {categories.map((category) => (
+                                <Option key={category.type} value={category.type}>
                                     {category.type}
                                 </Option>
                             ))}
@@ -114,9 +109,8 @@ const CreatePart: React.FC<CreatePartFormProps> = ({onPartCreated}) => {
                     <Form.Item
                         label="Additional Info"
                         name="additionalInfo"
-                        rules={[{required: false}]} // Optional field
                     >
-                        <Input placeholder="Enter additional information"/>
+                        <Input placeholder="Enter additional information" />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit" loading={loading} block>

@@ -1,65 +1,67 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
+import { Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import CreatePart from "./CreatePart";
-import EditPart from "./EditPart";
 import useAxios from "../../utils/api";
 import PartList from "./PartList";
 
-
 const PartPage: React.FC = () => {
-    const [parts, setParts] = useState<Part[]>([]); // State to hold parts
-    const [loading, setLoading] = useState<boolean>(true); // State for loading status
-    const [error, setError] = useState<string | null>(null); // State for error handling
-    const [partsUpdated, setPartsUpdated] = useState<boolean>(false);
-    const [part, setPart] = useState<Part | null>(null);
+    const [parts, setParts] = useState<Part[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isCreatePartVisible, setIsCreatePartVisible] = useState<boolean>(false);
 
     const api = useAxios();
 
     useEffect(() => {
-        const fetchParts = async () => {
-            try {
-                const response = await api.get<Part[]>("/part"); // Fetch parts from backend
-                setParts(response.data); // Update parts state
-            } catch (err) {
-                setError("Failed to fetch parts. Please try again later."); // Handle error
-            } finally {
-                setLoading(false); // Turn off loading spinner
-            }
-        };
+        if (!isCreatePartVisible) {
+            const fetchParts = async () => {
+                try {
+                    const response = await api.get<Part[]>("/part");
+                    setParts(response.data);
+                } catch (err) {
+                    setError("Failed to fetch parts. Please try again later.");
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-        fetchParts();
-    }, [partsUpdated]); // Empty dependency array means this runs once after component mounts
+            fetchParts();
+        }
+    }, [isCreatePartVisible, api]);
+
+    const handlePartCreated = (createdPart: Part) => {
+        setIsCreatePartVisible(false); // Hide CreatePart component
+    };
 
     if (loading) {
-        return <p>Loading...</p>; // Show loading message
+        return <p>Loading...</p>;
     }
 
     if (error) {
-        return <p style={{color: "red"}}>{error}</p>; // Show error message
+        return <p style={{ color: "red" }}>{error}</p>;
     }
 
-
-    const handlePartCreated = (createdPart: Part) => {
-        setPart(createdPart);
-        console.log("part id set: ", createdPart);
-    };
-
-    if (part === null) {
-        return (
-            <div>
-                <CreatePart onPartCreated={handlePartCreated}/>
-                <PartList parts={parts}/>
-            </div>
-        )
-    } else {
-        return (
-            <div>
-                <EditPart part={part} setPart={setPart}/>
-            </div>
-        )
-    }
-
-
-}
-
+    return (
+        <div>
+            {!isCreatePartVisible ? (
+                <>
+                    <div style={{ marginBottom: "16px", textAlign: "right" }}>
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCreatePartVisible(true)}
+                        >
+                            Create New Part
+                        </Button>
+                    </div>
+                    <PartList parts={parts} />
+                </>
+            ) : (
+                <CreatePart onPartCreated={handlePartCreated} />
+            )}
+        </div>
+    );
+};
 
 export default PartPage;

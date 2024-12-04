@@ -1,14 +1,20 @@
-import axios from "axios";
+import axios, {AxiosInstance} from "axios";
 import {useError} from "../context/ErrorContext";
 
+let authApi: AxiosInstance;
 
 const useAuthAxios = () => {
     const {setError} = useError();
-    const api = axios.create({
+
+
+    if (authApi) {
+        return authApi;
+    }
+    authApi = axios.create({
         baseURL: "http://localhost:8081/v1",
     });
 
-    api.interceptors.request.use(
+    authApi.interceptors.request.use(
         (config) => {
             const token = localStorage.getItem("authToken");
             if (token) {
@@ -21,7 +27,7 @@ const useAuthAxios = () => {
         }
     );
 
-    api.interceptors.response.use(
+    authApi.interceptors.response.use(
         (response) => response,
         (error) => {
             if (error.response) {
@@ -31,7 +37,7 @@ const useAuthAxios = () => {
         }
     );
 
-    return api;
+    return authApi;
 
 }
 

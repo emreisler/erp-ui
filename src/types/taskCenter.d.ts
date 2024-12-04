@@ -1,5 +1,5 @@
 interface TaskCenter {
-    Uuid: string;
+    uuid: string;
     number: string;
     name: string;
     isInspection: boolean;

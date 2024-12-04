@@ -1,107 +1,93 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { Table, Button, Typography, Space, Alert, Modal, Form, Input } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import useAxios from "../../utils/api";
-import { List, Button, Typography } from "antd";
+import AddOperationModal from "./AddOperationModal";
+import OperationList from "./OperationList";
 
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
 
 interface PartListProps {
     parts: Part[];
 }
 
-const PartList: React.FC<PartListProps> = ({parts}) => {
+const PartList: React.FC<PartListProps> = ({ parts }) => {
     const api = useAxios();
-
-    const [selectedPartUuid, setSelectedPartUuid] = useState<string | null>(null);
+    const [selectedPart, setSelectedPart] = useState<Part | null>(null);
     const [poError, setPoError] = useState<string | null>(null);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [form] = Form.useForm();
+    const [taskCenters] = useState<number[]>([106,107,108]); //todo fetch task centers from backend
 
-    const handleViewClick = (partUuid: string) => {
-        // Toggle the selected part
-        setSelectedPartUuid(partUuid === selectedPartUuid ? null : partUuid);
-    };
+    const handleAddOperation = async (operation: Operation) => {
+        if (!selectedPart) return;
 
-    const handleProductionOrder = async (partNumber: string) => {
-        setPoError(null);
+        setLoading(true);
         try {
-            const response = await api.post(`/production-orders`, {
-                partNumber: partNumber,
-                quantity: 1,
-            });
-            console.log(response.data);
-            // const addedOperation = response.data;
+            const response = await api.put(`part/operation/${selectedPart.number}`, operation);
+            console.log("Operation added:", response.data);
+            setIsModalVisible(false);
+            form.resetFields();
         } catch (err) {
             setPoError("Failed to add operation. Please try again.");
-            console.log(poError);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
+
+    const columns = [
+        {
+            title: "Number",
+            dataIndex: "number",
+            key: "number",
+        },
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "Project Code",
+            dataIndex: "projectCode",
+            key: "projectCode",
+        },
+        {
+            title: "Category",
+            dataIndex: "category",
+            key: "category",
+        },
+    ];
 
     return (
-        <div>
-            <h2>Parts</h2>
-            <List
+        <div style={{ padding: 24 }}>
+            <Title level={3}>Parts List</Title>
+            {poError && <Alert message={poError} type="error" showIcon style={{ marginBottom: 16 }} />}
+            <Table
                 dataSource={parts}
-                renderItem={(part) => (
-                    <List.Item
-                        key={part.uuid}
-                        actions={[
-                            <Button
-                                type="link"
-                                onClick={() => handleViewClick(part.uuid)}
-                                key="view"
-                            >
-                                {selectedPartUuid === part.uuid ? "Hide" : "View"}
-                            </Button>,
-                            <Button
-                                type="link"
-                                onClick={() => console.log("Edit", part)}
-                                key="edit"
-                            >
-                                Edit
-                            </Button>,
-                            <Button
-                                type="primary"
-                                onClick={() => handleProductionOrder(part.number)}
-                                key="create-po"
-                            >
-                                Create Production Order
-                            </Button>,
-                        ]}
-                    >
-                        <List.Item.Meta
-                            title={
-                                <div>
-                                    <strong>{part.number}</strong> - {part.name}
-                                </div>
-                            }
+                columns={columns}
+                rowKey="uuid"
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <OperationList
+                            operations={record.operationList}
+                            onAddOperation={() => {
+                                setSelectedPart(record);
+                                setIsModalVisible(true);
+                            }}
                         />
-                        {selectedPartUuid === part.uuid && (
-                            <div>
-                                <h3>Operations</h3>
-                                {part.operationList && part.operationList.length > 0 ? (
-                                    <List
-                                        dataSource={part.operationList}
-                                        renderItem={(operation) => (
-                                            <List.Item
-                                                key={`${operation.TaskCenterNumber}-${operation.Description}`}
-                                            >
-                                                <Text strong>
-                                                    {operation.TaskCenterNumber}
-                                                </Text>
-                                                : {operation.Description}
-                                            </List.Item>
-                                        )}
-                                    />
-                                ) : (
-                                    <Text type="secondary">
-                                        No operations available for this part.
-                                    </Text>
-                                )}
-                            </div>
-                        )}
-                    </List.Item>
-                )}
+                    ),
+                }}
+                bordered
+                pagination={{ pageSize: 10 }}
             />
-            {poError && <Text type="danger">{poError}</Text>}
+            <AddOperationModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                onAddOperation={handleAddOperation}
+                taskCenters={taskCenters}
+            />
         </div>
     );
 };

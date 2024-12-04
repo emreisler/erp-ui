@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Selector from "./components/selector/Selector";
-import "./App.css"
+// import "./App.css"
 import {Route, BrowserRouter as Router, Routes, Navigate} from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";

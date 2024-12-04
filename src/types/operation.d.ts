@@ -1,6 +1,6 @@
 interface Operation {
-    StepNumber: number;
-    TaskCenterNumber: string;
-    Description: string;
-    ImageUrl: string;
+    partNumber: number;
+    sepNumber: number;
+    description: string;
+    taskCenterNo: string;
 }

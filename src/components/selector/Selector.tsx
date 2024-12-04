@@ -1,10 +1,17 @@
 import React, { useState } from "react";
+import { Layout, Menu } from "antd";
+import {
+    AppstoreOutlined,
+    ShopOutlined,
+    FileTextOutlined,
+    TeamOutlined,
+} from "@ant-design/icons";
 import PartPage from "../part/PartPage";
-import "./Selector.css"
-import ProductionOrder from "../production_order/ProductionOrderList";
 import ProductionOrderList from "../production_order/ProductionOrderList";
-import TaskCenterList from "../TaskCenterList";
-import StockList from "../StockList";
+import TaskCenterList from "../taskCenter/TaskCenters";
+import StockList from "../stock/StockList";
+
+const { Sider, Content } = Layout;
 
 const Selector: React.FC = () => {
     const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders" | "task-center">(
@@ -14,62 +21,47 @@ const Selector: React.FC = () => {
     const renderContent = () => {
         switch (selected) {
             case "parts":
-                return (
-                    <>
-                        <PartPage />
-                    </>
-                );
+                return <PartPage />;
             case "stocks":
-                return (
-                    <>
-                        <StockList/>
-                    </>
-                );
+                return <StockList />;
             case "prod-orders":
-                return (
-                    <>
-                        <ProductionOrderList/>
-                    </>
-                );
+                return <ProductionOrderList />;
             case "task-center":
-                return (
-                    <TaskCenterList/>
-                )
+                return <TaskCenterList />;
             default:
                 return null;
         }
     };
 
     return (
-        <div className="sidebar-container">
-            <div className="sidebar">
-                <button
-                    onClick={() => setSelected("parts")}
-                    className={selected === "parts" ? "active" : ""}
+        <Layout style={{ minHeight: "100vh" }}>
+            <Sider collapsible>
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    selectedKeys={[selected]}
+                    onClick={(e) => setSelected(e.key as "parts" | "stocks" | "prod-orders" | "task-center")}
                 >
-                    Parts
-                </button>
-                <button
-                    onClick={() => setSelected("prod-orders")}
-                    className={selected === "prod-orders" ? "active" : ""}
-                >
-                    Production Orders
-                </button>
-                <button
-                    onClick={() => setSelected("stocks")}
-                    className={selected === "stocks" ? "active" : ""}
-                >
-                    Stocks
-                </button>
-                <button
-                    onClick={() => setSelected("task-center")}
-                    className={selected === "task-center" ? "active" : ""}
-                >
-                    Task Centers
-                </button>
-            </div>
-            <div className="content">{renderContent()}</div>
-        </div>
+                    <Menu.Item key="parts" icon={<AppstoreOutlined />}>
+                        Parts
+                    </Menu.Item>
+                    <Menu.Item key="prod-orders" icon={<FileTextOutlined />}>
+                        Production Orders
+                    </Menu.Item>
+                    <Menu.Item key="stocks" icon={<ShopOutlined />}>
+                        Stocks
+                    </Menu.Item>
+                    <Menu.Item key="task-center" icon={<TeamOutlined />}>
+                        Task Centers
+                    </Menu.Item>
+                </Menu>
+            </Sider>
+            <Layout>
+                <Content style={{ padding: "24px" }}>
+                    {renderContent()}
+                </Content>
+            </Layout>
+        </Layout>
     );
 };
 
