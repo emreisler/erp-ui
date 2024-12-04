@@ -1,14 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import useAxios from "../../utils/api";
 
 
 interface EditPartComponentProps {
-    partUuid: string; // ID of the part to edit
+    part: Part
+    setPart: (part: Part | null) => void;
 }
 
 
-const EditPart: React.FC<EditPartComponentProps> = ({partUuid}) => {
+const EditPart: React.FC<EditPartComponentProps> = ({part, setPart}) => {
     const [operations, setOperations] = useState<Operation[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [editPart, setEditPart] = useState<Boolean>(true);
     const [newOperation, setNewOperation] = useState<Operation>({
         StepNumber: 0,
         TaskCenterNumber: "",
@@ -17,21 +20,34 @@ const EditPart: React.FC<EditPartComponentProps> = ({partUuid}) => {
     });
     const [error, setError] = useState<string | null>(null);
 
+
+    useEffect(() => {
+        const fetchOps = async () => {
+            try {
+                const response = await api.get<Part>(`/parts/${part.number}`);
+                setOperations(response.data.operationList);
+                setLoading(false);
+            } catch (error) {
+                setError("Failed to fetch parts. Please try again later."); // Handle error
+            } finally {
+                setLoading(false); // Turn off loading spinner
+            }
+        }
+        fetchOps();
+
+    }, [newOperation])
+
+
     const api = useAxios();
 
     // Handle adding operation
     const handleAddOperation = async () => {
         setError(null);
         try {
-            const response = await api.put(`/parts/${partUuid}/operations`, newOperation);
+            const response = await api.put(`/parts/${part.uuid}/operations`, newOperation);
             const addedOperation = response.data;
             setOperations((prev) => [...prev, addedOperation]);
-            setNewOperation({
-                StepNumber: 0,
-                TaskCenterNumber: "",
-                Description: "",
-                ImageUrl: "",
-            });
+            setNewOperation(newOperation);
         } catch (err) {
             setError("Failed to add operation. Please try again.");
         }
@@ -39,7 +55,7 @@ const EditPart: React.FC<EditPartComponentProps> = ({partUuid}) => {
 
     return (
         <div>
-            <h3>Edit Part: {partUuid}</h3>
+            <h3>Edit Part: {part.number}</h3>
             <h4>Add Operations</h4>
             <input
                 placeholder="Step Number"
@@ -71,6 +87,10 @@ const EditPart: React.FC<EditPartComponentProps> = ({partUuid}) => {
                 }
             />
             <button onClick={handleAddOperation}>Add Operation</button>
+            <button onClick={() => {
+                setPart(null);
+            }}>Exit
+            </button>
 
             {error && <p style={{color: "red"}}>{error}</p>}
 

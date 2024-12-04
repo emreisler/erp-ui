@@ -1,6 +1,6 @@
 interface Part {
-    Uuid: string;
-    Number: string;
-    Name: string;
-    Operations?: Operation[];
+    uuid: string;
+    number: string;
+    name: string;
+    operationList: Operation[];
 }

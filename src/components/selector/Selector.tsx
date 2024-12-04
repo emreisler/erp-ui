@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import PartPage from "../part/PartPage";
 import "./Selector.css"
+import ProductionOrder from "../production_order/ProductionOrderList";
+import ProductionOrderList from "../production_order/ProductionOrderList";
+import TaskCenterList from "../TaskCenterList";
+import StockList from "../StockList";
 
 const Selector: React.FC = () => {
-    const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders">(
+    const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders" | "task-center">(
         "parts"
     );
 
@@ -18,15 +22,19 @@ const Selector: React.FC = () => {
             case "stocks":
                 return (
                     <>
-                        <div>Stocks Content</div>
+                        <StockList/>
                     </>
                 );
             case "prod-orders":
                 return (
                     <>
-                        <div>Production Orders Content</div>
+                        <ProductionOrderList/>
                     </>
                 );
+            case "task-center":
+                return (
+                    <TaskCenterList/>
+                )
             default:
                 return null;
         }
@@ -52,6 +60,12 @@ const Selector: React.FC = () => {
                     className={selected === "stocks" ? "active" : ""}
                 >
                     Stocks
+                </button>
+                <button
+                    onClick={() => setSelected("task-center")}
+                    className={selected === "task-center" ? "active" : ""}
+                >
+                    Task Centers
                 </button>
             </div>
             <div className="content">{renderContent()}</div>

@@ -10,14 +10,14 @@ const PartPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true); // State for loading status
     const [error, setError] = useState<string | null>(null); // State for error handling
     const [partsUpdated, setPartsUpdated] = useState<boolean>(false);
-    const [partUuid, setPartUuid] = useState<string | null>(null);
+    const [part, setPart] = useState<Part | null>(null);
 
     const api = useAxios();
 
     useEffect(() => {
         const fetchParts = async () => {
             try {
-                const response = await api.get<Part[]>("/parts"); // Fetch parts from backend
+                const response = await api.get<Part[]>("/part"); // Fetch parts from backend
                 setParts(response.data); // Update parts state
             } catch (err) {
                 setError("Failed to fetch parts. Please try again later."); // Handle error
@@ -37,18 +37,13 @@ const PartPage: React.FC = () => {
         return <p style={{color: "red"}}>{error}</p>; // Show error message
     }
 
-    // const addPart = async (number: string, name: string) => {
-    //     const partsRes = await api.post(`http://localhost:8080/v1/parts`, {number, name});
-    //     setParts(partsRes.data);
-    // };
 
-
-    const handlePartCreated = (createdPartUuid: string) => {
-        setPartUuid(createdPartUuid);
-        console.log("part id set: ", createdPartUuid);
+    const handlePartCreated = (createdPart: Part) => {
+        setPart(createdPart);
+        console.log("part id set: ", createdPart);
     };
 
-    if (partUuid === null || partUuid === "") {
+    if (part === null) {
         return (
             <div>
                 <CreatePart onPartCreated={handlePartCreated}/>
@@ -57,9 +52,9 @@ const PartPage: React.FC = () => {
         )
     } else {
         return (
-        <div>
-            <EditPart partUuid={partUuid}/>
-        </div>
+            <div>
+                <EditPart part={part} setPart={setPart}/>
+            </div>
         )
     }
 

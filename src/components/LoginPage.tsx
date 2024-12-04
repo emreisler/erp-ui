@@ -1,37 +1,61 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {LoginUserRequest, LoginUserResponse} from "../types/auth";
 import {useNavigate} from "react-router-dom";
-import useAxios from "../utils/api";
+import useAuthAxios from "../utils/authApi";
+import {useAuth} from "./hooks/Auth";
 
 interface Props {
     setAuthToken: (token: string) => void;
 }
 
 const LoginPage: React.FC<Props> = ({setAuthToken}) => {
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string>("");
+    const [email, setEmail] = useState<string>("admin@example.com");
+    const [password, setPassword] = useState<string>("admin123");
+    const { login } = useAuth();
     const navigate = useNavigate();
+    const [error, setError] = useState<string>("");
 
-    const api = useAxios();
+    const api = useAuthAxios();
+
+    // Validate token in localStorage on component mount
+    useEffect(() => {
+        const validateToken = async () => {
+            const token = localStorage.getItem("authToken");
+            console.log("validateToken", token);
+            if (token) {
+                try {
+                    // Call the /validate endpoint to check token validity
+                    api.get("/auth/validate", {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    // If the token is valid, navigate to the dashboard
+                    navigate("/app");
+                    console.log("token validated");
+                } catch (error) {
+                    console.error("Token validation failed:", error);
+                    localStorage.removeItem("authToken"); // Remove invalid token
+                }
+            }
+        };
+        validateToken();
+    }, [navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
         const requestBody: LoginUserRequest = {
-            username,
+            email,
             password,
         };
 
         try {
-            const response = await api.post<LoginUserResponse>("/login", requestBody);
+            const response = await api.post<LoginUserResponse>("/auth/login", requestBody);
             const {token} = response.data;
-
-            // Save token in localStorage and pass it to parent state
-            localStorage.setItem("authToken", token);
-            setAuthToken(token);
-
+            console.log(token);
+            login(response.data.token);
             // Redirect to dashboard
             navigate("/app");
         } catch (err) {
@@ -47,8 +71,8 @@ const LoginPage: React.FC<Props> = ({setAuthToken}) => {
                     <label>Username:</label>
                     <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                 </div>
