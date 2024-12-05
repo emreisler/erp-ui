@@ -1,7 +1,10 @@
 interface ProductionOrder {
-    ID: number
-    Code: string
-    PartNumber: string
-    Quantity: int
-    Closed: bool
+    orderId: string;
+    code: string;
+    partNumber: string;
+    quantity: number;
+    status: string; // Enum values: created, in_progress, on_hold, cancelled, completed
+    currentStep: number;
+    totalStep: number;
+    currentTaskCenter: number;
 }

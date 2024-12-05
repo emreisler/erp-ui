@@ -1,37 +1,52 @@
-import React, { useState } from "react";
-import { Table, Button, Typography, Space, Alert, Modal, Form, Input } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, {useState} from "react";
+import {Table, Button, Typography, Space, Alert} from "antd";
+import {PlusOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
 import AddOperationModal from "./AddOperationModal";
 import OperationList from "./OperationList";
+import CreateProductionOrderModal from "./CreateProductionOrderModal";
+import {useError} from "../../context/ErrorContext";
 
-const { Title, Text } = Typography;
+const {Title} = Typography;
 
 
 interface PartListProps {
     parts: Part[];
 }
 
-const PartList: React.FC<PartListProps> = ({ parts }) => {
+const PartList: React.FC<PartListProps> = ({parts}) => {
     const api = useAxios();
     const [selectedPart, setSelectedPart] = useState<Part | null>(null);
     const [poError, setPoError] = useState<string | null>(null);
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [form] = Form.useForm();
-    const [taskCenters] = useState<number[]>([106,107,108]); //todo fetch task centers from backend
+    const {setError} = useError()
+    const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
+    const [taskCenters] = useState<number[]>([106,107,108]);
 
     const handleAddOperation = async (operation: Operation) => {
         if (!selectedPart) return;
+        try {
+            await api.put(`/part/operation/${selectedPart.number}`, operation);
+            console.log("Operation added successfully:", operation);
+        } catch (err) {
+            setError("Failed to add operation. Please try again.");
+        }
+    };
 
+
+
+    const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
         setLoading(true);
         try {
-            const response = await api.put(`part/operation/${selectedPart.number}`, operation);
-            console.log("Operation added:", response.data);
-            setIsModalVisible(false);
-            form.resetFields();
+            await api.post("/production-orders", {
+                partNo: partNumber,
+                quantity,
+                endDate,
+            });
+            setIsPoModalVisible(false);
         } catch (err) {
-            setPoError("Failed to add operation. Please try again.");
+            setPoError("Failed to create production order. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -58,12 +73,29 @@ const PartList: React.FC<PartListProps> = ({ parts }) => {
             dataIndex: "category",
             key: "category",
         },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: Part) => (
+                <Space>
+                    <Button
+                        icon={<PlusOutlined/>}
+                        onClick={() => {
+                            setSelectedPart(record);
+                            setIsPoModalVisible(true);
+                        }}
+                    >
+                        Create Production Order
+                    </Button>
+                </Space>
+            ),
+        },
     ];
 
     return (
-        <div style={{ padding: 24 }}>
+        <div style={{padding: 24}}>
             <Title level={3}>Parts List</Title>
-            {poError && <Alert message={poError} type="error" showIcon style={{ marginBottom: 16 }} />}
+            {poError && <Alert message={poError} type="error" showIcon style={{marginBottom: 16}}/>}
             <Table
                 dataSource={parts}
                 columns={columns}
@@ -74,20 +106,29 @@ const PartList: React.FC<PartListProps> = ({ parts }) => {
                             operations={record.operationList}
                             onAddOperation={() => {
                                 setSelectedPart(record);
-                                setIsModalVisible(true);
+                                setIsAddOperationModalVisible(true);
                             }}
                         />
                     ),
                 }}
                 bordered
-                pagination={{ pageSize: 10 }}
+                pagination={{pageSize: 10}}
             />
             <AddOperationModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
+                visible={isAddOperationModalVisible}
+                onClose={() => setIsAddOperationModalVisible(false)}
                 onAddOperation={handleAddOperation}
                 taskCenters={taskCenters}
             />
+            {selectedPart && (
+                <CreateProductionOrderModal
+                    visible={isPoModalVisible}
+                    part={selectedPart}
+                    onClose={() => setIsPoModalVisible(false)}
+                    onCreate={handleCreateProductionOrder}
+                    loading={loading}
+                />
+            )}
         </div>
     );
 };

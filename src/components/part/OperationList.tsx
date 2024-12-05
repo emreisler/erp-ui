@@ -1,6 +1,7 @@
 import React from "react";
 import {Table, Typography, Button} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
+import AddOperationModal from "./AddOperationModal";
 
 const {Text} = Typography;
 
