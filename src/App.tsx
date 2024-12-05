@@ -7,6 +7,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorPopup from "./components/error/ErrorPopup";
 import {ErrorProvider} from "./context/ErrorContext";
 import {AuthProvider} from "./components/hooks/Auth";
+import {SuccessProvider} from "./context/SuccessContext";
+import SuccessPopup from "./components/success/SuccessPopup";
 
 
 const App: React.FC = () => {
@@ -20,26 +22,30 @@ const App: React.FC = () => {
 
     return (
         <AuthProvider>
-            <ErrorProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/login" replace/>}/>
-                        <Route
-                            path="/login"
-                            element={<LoginPage setAuthToken={setAuthToken}/>}
-                        />
-                        <Route
-                            path="/app"
-                            element={
-                                <ProtectedRoute>
-                                    <ErrorPopup/>
-                                    <Selector/>
-                                </ProtectedRoute>
-                            }
-                        />
-                    </Routes>
-                </Router>
-            </ErrorProvider>
+            <SuccessProvider>
+                <SuccessPopup/>
+                <ErrorProvider>
+                    <ErrorPopup/>
+                    <Router>
+                        <Routes>
+                            <Route path="/" element={<Navigate to="/login" replace/>}/>
+                            <Route
+                                path="/login"
+                                element={<LoginPage setAuthToken={setAuthToken}/>}
+                            />
+                            <Route
+                                path="/app"
+                                element={
+                                    <ProtectedRoute>
+                                        <ErrorPopup/>
+                                        <Selector/>
+                                    </ProtectedRoute>
+                                }
+                            />
+                        </Routes>
+                    </Router>
+                </ErrorProvider>
+            </SuccessProvider>
         </AuthProvider>
     );
 };

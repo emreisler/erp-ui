@@ -45,6 +45,7 @@ const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation
             ) : (
                 <Text type="secondary">No operations available for this part.</Text>
             )}
+            <br/>
             <Button
                 type="primary"
                 icon={<PlusOutlined/>}

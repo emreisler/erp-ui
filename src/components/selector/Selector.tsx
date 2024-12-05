@@ -18,6 +18,12 @@ const Selector: React.FC = () => {
         "parts"
     );
 
+    const [collapsed, setCollapsed] = useState(true);
+
+    const handleCollapsable = () => {
+        setCollapsed(!collapsed);
+    }
+
     const renderContent = () => {
         switch (selected) {
             case "parts":
@@ -35,7 +41,7 @@ const Selector: React.FC = () => {
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
-            <Sider collapsible>
+            <Sider collapsed={collapsed} onCollapse={handleCollapsable} collapsible>
                 <Menu
                     theme="dark"
                     mode="inline"

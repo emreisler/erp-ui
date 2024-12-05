@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Button, Typography, List, Modal, Space, Alert,Tag } from "antd"
+import { Button, Typography, Table, Modal, Space, Tag, Input, Row, Col } from "antd";
 import { PlusOutlined, CheckCircleOutlined, ToolOutlined } from "@ant-design/icons";
 import useAxios from "../../utils/api";
 import TaskCenterForm from "./TaskCenterForm";
-import {useError} from "../../context/ErrorContext";
+import { useError } from "../../context/ErrorContext";
 
 const { Title } = Typography;
-
+const { Search } = Input;
 
 const TaskCenters: React.FC = () => {
     const [taskCenters, setTaskCenters] = useState<TaskCenter[]>([]);
+    const [filteredTaskCenters, setFilteredTaskCenters] = useState<TaskCenter[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const { error, setError } = useError();
     const [selectedTaskCenter, setSelectedTaskCenter] = useState<TaskCenter | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
+
+    const [filters, setFilters] = useState({
+        name: "",
+        number: "",
+    });
 
     const api = useAxios();
 
@@ -23,6 +29,7 @@ const TaskCenters: React.FC = () => {
             setLoading(true);
             const response = await api.get<TaskCenter[]>("/task-center");
             setTaskCenters(response.data);
+            setFilteredTaskCenters(response.data); // Set initial filtered list
         } catch (err) {
             setError("Failed to fetch task centers. Please try again later.");
         } finally {
@@ -57,6 +64,71 @@ const TaskCenters: React.FC = () => {
         }
     };
 
+    const handleSearch = () => {
+        const regex = (value: string) => new RegExp(`^${value.replace("*", ".*")}`, "i");
+        const filtered = taskCenters.filter((taskCenter) => {
+            return (
+                (!filters.name || regex(filters.name).test(taskCenter.name)) &&
+                (!filters.number || regex(filters.number).test(taskCenter.number))
+            );
+        });
+        setFilteredTaskCenters(filtered);
+    };
+
+    const handleFilterChange = (field: keyof typeof filters, value: string) => {
+        setFilters((prevFilters) => ({ ...prevFilters, [field]: value }));
+    };
+
+    const resetFilters = () => {
+        setFilters({
+            name: "",
+            number: "",
+        });
+        setFilteredTaskCenters(taskCenters); // Reset to the original list
+    };
+
+    useEffect(() => {
+        handleSearch(); // Trigger search whenever filters change
+    }, [filters]);
+
+    const columns = [
+        {
+            title: "Number",
+            dataIndex: "number",
+            key: "number",
+        },
+        {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "Inspection",
+            dataIndex: "isInspection",
+            key: "isInspection",
+            render: (isInspection: boolean) =>
+                isInspection ? (
+                    <Tag color="green">Yes</Tag>
+                ) : (
+                    <Tag color="blue">No</Tag>
+                ),
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: TaskCenter) => (
+                <Space>
+                    <Button type="link" onClick={() => openUpdateModal(record)}>
+                        Edit
+                    </Button>
+                    <Button type="link" danger onClick={() => handleDelete(record.uuid)}>
+                        Delete
+                    </Button>
+                </Space>
+            ),
+        },
+    ];
+
     const openCreateModal = () => {
         setModalMode("create");
         setSelectedTaskCenter(null);
@@ -72,66 +144,39 @@ const TaskCenters: React.FC = () => {
     return (
         <div style={{ padding: 24 }}>
             <Title level={3}>Task Centers</Title>
+            <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col span={8}>
+                    <Search
+                        placeholder="Search by Name"
+                        value={filters.name}
+                        onChange={(e) => handleFilterChange("name", e.target.value)}
+                    />
+                </Col>
+                <Col span={8}>
+                    <Search
+                        placeholder="Search by Number"
+                        value={filters.number}
+                        onChange={(e) => handleFilterChange("number", e.target.value)}
+                    />
+                </Col>
+                <Col span={8}>
+                    <Button type="default" onClick={resetFilters}>
+                        Reset Filters
+                    </Button>
+                </Col>
+            </Row>
             <div style={{ marginBottom: 16, textAlign: "right" }}>
                 <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
                     Create New Task Center
                 </Button>
             </div>
-            <List
+            <Table
                 bordered
-                dataSource={taskCenters}
+                dataSource={filteredTaskCenters}
+                columns={columns}
+                rowKey="uuid"
                 loading={loading}
-                renderItem={(taskCenter) => (
-                    <List.Item
-                        actions={[
-                            <Button
-                                type="link"
-                                onClick={() => openUpdateModal(taskCenter)}
-                                key="edit"
-                            >
-                                Edit
-                            </Button>,
-                            <Button
-                                type="link"
-                                danger
-                                onClick={() => handleDelete(taskCenter.uuid)}
-                                key="delete"
-                            >
-                                Delete
-                            </Button>,
-                        ]}
-                        style={{
-                            backgroundColor: taskCenter.isInspection
-                                ? "#f6ffed" // Light green for inspection task centers
-                                : "#ffffff", // White for regular task centers
-                        }}
-                    >
-                        <List.Item.Meta
-                            avatar={
-                                taskCenter.isInspection ? (
-                                    <CheckCircleOutlined
-                                        style={{ fontSize: "24px", color: "#52c41a" }}
-                                    />
-                                ) : (
-                                    <ToolOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
-                                )
-                            }
-                            title={
-                                <>
-                                    {taskCenter.number} - {taskCenter.name}
-                                    {taskCenter.isInspection && (
-                                        <Tag color="green" style={{ marginLeft: "8px" }}>
-                                            Inspection
-                                        </Tag>
-                                    )}
-                                </>
-                            }
-                            description={`Inspection: ${
-                                taskCenter.isInspection ? "Yes" : "No"
-                            }`}
-                        />
-                    </List.Item>
-                )}
+                pagination={{ pageSize: 10 }}
             />
             <Modal
                 title={modalMode === "create" ? "Create Task Center" : "Update Task Center"}

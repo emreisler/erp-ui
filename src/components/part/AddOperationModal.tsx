@@ -21,6 +21,7 @@ const AddOperationModal: React.FC<AddOperationModalProps> = ({
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
 
+
     const handleFinish = async (values: Operation) => {
         setLoading(true);
         try {

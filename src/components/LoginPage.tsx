@@ -56,11 +56,12 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
     };
 
     return (
-        <div style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}>
-            <Title level={2} style={{ textAlign: "center" }}>
+        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px"}}>
+
+            <Title level={2} style={{textAlign: "center"}}>
                 Login
             </Title>
-            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+            {error && <Alert message={error} type="error" showIcon style={{marginBottom: 16}}/>}
             <Form
                 layout="vertical"
                 onFinish={handleLogin}
@@ -73,18 +74,18 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
                     label="Email"
                     name="email"
                     rules={[
-                        { required: true, message: "Please input your email!" },
-                        { type: "email", message: "Please enter a valid email!" },
+                        {required: true, message: "Please input your email!"},
+                        {type: "email", message: "Please enter a valid email!"},
                     ]}
                 >
-                    <Input placeholder="Enter your email" />
+                    <Input placeholder="Enter your email"/>
                 </Form.Item>
                 <Form.Item
                     label="Password"
                     name="password"
-                    rules={[{ required: true, message: "Please input your password!" }]}
+                    rules={[{required: true, message: "Please input your password!"}]}
                 >
-                    <Input.Password placeholder="Enter your password" />
+                    <Input.Password placeholder="Enter your password"/>
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit" loading={loading} block>
@@ -92,7 +93,7 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
                     </Button>
                 </Form.Item>
             </Form>
-            {loading && <Spin tip="Validating login..." style={{ display: "block", marginTop: 16 }} />}
+            {loading && <Spin tip="Validating login..." style={{display: "block", marginTop: 16}}/>}
         </div>
     );
 };
