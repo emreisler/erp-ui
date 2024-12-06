@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Alert, Spin } from "antd";
-import { useError } from "../../context/ErrorContext";
+import {Table, Typography, Alert, Spin, message} from "antd";
 import useAxios from "../../utils/api";
 
 const { Title } = Typography;
@@ -18,7 +17,6 @@ const StockList: React.FC = () => {
     const api = useAxios();
     const [loading, setLoading] = useState(true);
     const [stockList, setStockList] = useState<Stock[]>([]);
-    const { error, setError } = useError();
 
     useEffect(() => {
         const fetchStocks = async () => {
@@ -27,14 +25,14 @@ const StockList: React.FC = () => {
                 const response = await api.get<Stock[]>("/stock");
                 setStockList(response.data);
             } catch (err) {
-                setError("Failed to fetch stocks. Please try again later.");
+                message.error("Failed to fetch stocks. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchStocks();
-    }, [api, error]);
+    }, [api]);
 
     const columns = [
         {
@@ -68,7 +66,6 @@ const StockList: React.FC = () => {
     return (
         <div style={{ padding: 24 }}>
             <Title level={3}>Stocks</Title>
-            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
             {loading ? (
                 <Spin tip="Loading stocks..." />
             ) : (

@@ -3,7 +3,7 @@ import { LoginUserRequest, LoginUserResponse } from "../types/auth";
 import { useNavigate } from "react-router-dom";
 import useAuthAxios from "../utils/authApi";
 import { useAuth } from "./hooks/Auth";
-import { Form, Input, Button, Typography, Alert, Spin } from "antd";
+import {Form, Input, Button, Typography, Alert, Spin, message} from "antd";
 
 const { Title } = Typography;
 
@@ -17,14 +17,14 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const api = useAuthAxios();
+    const authApi = useAuthAxios();
 
     useEffect(() => {
         const validateToken = async () => {
             const token = localStorage.getItem("authToken");
             if (token) {
                 try {
-                    await api.get("/auth/validate", {
+                    await authApi.get("/auth/validate", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
@@ -32,6 +32,7 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
                     navigate("/app");
                 } catch (err) {
                     console.error("Token validation failed:", err);
+                    message.error("Token validation failed");
                     localStorage.removeItem("authToken");
                 }
             }
@@ -39,14 +40,14 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
         validateToken();
     }, [navigate]);
 
-    const handleLogin = async (values: LoginUserRequest) => {
+    const handleLogin = async (loginUserRequest: LoginUserRequest) => {
         setError("");
         setLoading(true);
 
         try {
-            const response = await api.post<LoginUserResponse>("/auth/login", values);
+            const response = await authApi.post<LoginUserResponse>("/auth/login", loginUserRequest);
             const { token } = response.data;
-            login(token);
+            login(token, loginUserRequest.email);
             navigate("/app");
         } catch (err) {
             setError("Invalid username or password");

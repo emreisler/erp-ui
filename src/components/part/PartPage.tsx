@@ -25,10 +25,9 @@ const PartPage: React.FC = () => {
                     setLoading(false);
                 }
             };
-
             fetchParts();
         }
-    }, [isCreatePartVisible, api]);
+    }, [isCreatePartVisible]);
 
     const handlePartCreated = (createdPart: Part) => {
         setIsCreatePartVisible(false); // Hide CreatePart component
@@ -46,7 +45,7 @@ const PartPage: React.FC = () => {
         <div>
             {!isCreatePartVisible ? (
                 <>
-                    <div style={{ marginBottom: "16px", textAlign: "left" }}>
+                    <div style={{ marginBottom: "16px", textAlign: "left"}}>
                         <Button
                             type="primary"
                             icon={<PlusOutlined />}

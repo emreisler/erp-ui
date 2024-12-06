@@ -1,14 +1,11 @@
 import React, {useEffect, useState} from "react";
 import Selector from "./components/selector/Selector";
-// import "./App.css"
 import {Route, BrowserRouter as Router, Routes, Navigate} from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ErrorPopup from "./components/error/ErrorPopup";
-import {ErrorProvider} from "./context/ErrorContext";
 import {AuthProvider} from "./components/hooks/Auth";
-import {SuccessProvider} from "./context/SuccessContext";
-import SuccessPopup from "./components/success/SuccessPopup";
+import SettingsPage from "./components/settings/SettingsPage";
+import NotificationsPage from "./components/notifications/NotificationsPage";
 
 
 const App: React.FC = () => {
@@ -22,30 +19,34 @@ const App: React.FC = () => {
 
     return (
         <AuthProvider>
-            <SuccessProvider>
-                <SuccessPopup/>
-                <ErrorProvider>
-                    <ErrorPopup/>
-                    <Router>
-                        <Routes>
-                            <Route path="/" element={<Navigate to="/login" replace/>}/>
-                            <Route
-                                path="/login"
-                                element={<LoginPage setAuthToken={setAuthToken}/>}
-                            />
-                            <Route
-                                path="/app"
-                                element={
-                                    <ProtectedRoute>
-                                        <ErrorPopup/>
-                                        <Selector/>
-                                    </ProtectedRoute>
-                                }
-                            />
-                        </Routes>
-                    </Router>
-                </ErrorProvider>
-            </SuccessProvider>
+
+            <Router>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/login" replace/>}/>
+                    <Route
+                        path="/login"
+                        element={<LoginPage setAuthToken={setAuthToken}/>}
+                    />
+                    <Route path="/settings" element={
+                        <ProtectedRoute>
+                            <SettingsPage/>
+                        </ProtectedRoute>
+                    }/>
+                    <Route path="/notifications" element={
+                        <ProtectedRoute>
+                            <NotificationsPage/>
+                        </ProtectedRoute>
+                    }/>
+                    <Route
+                        path="/app"
+                        element={
+                            <ProtectedRoute>
+                                <Selector/>
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </Router>
         </AuthProvider>
     );
 };

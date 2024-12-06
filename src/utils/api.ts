@@ -1,6 +1,6 @@
 import axios, {AxiosInstance} from "axios";
-import {useError} from "../context/ErrorContext";
 import {useAuth} from "../components/hooks/Auth";
+import {message} from "antd";
 
 
 let api: AxiosInstance | null = null;
@@ -8,7 +8,6 @@ let api: AxiosInstance | null = null;
 const useAxios = () => {
 
     const {logout} = useAuth();
-    const {setError} = useError();
 
     if (api) {
         return api;
@@ -39,7 +38,7 @@ const useAxios = () => {
                 if (error.response && error.response.status === 401) {
                     logout(); // Logout user if token is invalid or expired
                 }
-                setError(error.response.data.message || "An unexpected error occurred.");
+                message.error(error.response.data.message || "An unexpected error occurred.");
             }
             return Promise.reject(error);
         }

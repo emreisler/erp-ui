@@ -1,10 +1,9 @@
 import axios, {AxiosInstance} from "axios";
-import {useError} from "../context/ErrorContext";
+import {message} from "antd";
 
 let authApi: AxiosInstance;
 
 const useAuthAxios = () => {
-    const {setError} = useError();
 
 
     if (authApi) {
@@ -31,7 +30,7 @@ const useAuthAxios = () => {
         (response) => response,
         (error) => {
             if (error.response) {
-                setError(error.response.data.message || "An unexpected error occurred.");
+                message.error(error.response.data.message || "An unexpected error occurred.")
             }
             return Promise.reject(error);
         }

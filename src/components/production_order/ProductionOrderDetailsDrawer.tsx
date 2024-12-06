@@ -1,8 +1,7 @@
 import React from "react";
-import {Drawer, Descriptions, Button, Space} from "antd";
+import {Drawer, Descriptions, Button, Space, message} from "antd";
 import {generateProductionOrderPDF} from "../../utils/pdfGenerator";
 import useAxios from "../../utils/api";
-import {useError} from "../../context/ErrorContext";
 
 interface ProductionOrderDetailsDrawerProps {
     visible: boolean;
@@ -16,14 +15,13 @@ const ProductionOrderDetailsDrawer: React.FC<ProductionOrderDetailsDrawerProps> 
                                                                                        onClose,
                                                                                    }) => {
     const api = useAxios();
-    const {error, setError} = useError();
 
     const fetchPartDetails = async (partNumber: string) => {
         try {
             const response = await api.get(`/part/number/${partNumber}`);
             return response.data;
         } catch (err) {
-            setError("Failed to fetch part details. Please try again.");
+            message.error("Failed to fetch part details. Please try again.");
             throw err; // Re-throw the error to handle it in the calling function if needed
         }
 

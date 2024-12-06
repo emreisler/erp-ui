@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, Typography, Table, Modal, Space, Tag, Input, Row, Col } from "antd";
+import {Button, Typography, Table, Modal, Space, Tag, Input, Row, Col, message} from "antd";
 import { PlusOutlined, CheckCircleOutlined, ToolOutlined } from "@ant-design/icons";
 import useAxios from "../../utils/api";
 import TaskCenterForm from "./TaskCenterForm";
-import { useError } from "../../context/ErrorContext";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -12,7 +11,6 @@ const TaskCenters: React.FC = () => {
     const [taskCenters, setTaskCenters] = useState<TaskCenter[]>([]);
     const [filteredTaskCenters, setFilteredTaskCenters] = useState<TaskCenter[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const { error, setError } = useError();
     const [selectedTaskCenter, setSelectedTaskCenter] = useState<TaskCenter | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
@@ -31,7 +29,7 @@ const TaskCenters: React.FC = () => {
             setTaskCenters(response.data);
             setFilteredTaskCenters(response.data); // Set initial filtered list
         } catch (err) {
-            setError("Failed to fetch task centers. Please try again later.");
+            message.error("Failed to fetch task centers. Please try again later.");
         } finally {
             setLoading(false);
         }
@@ -51,7 +49,7 @@ const TaskCenters: React.FC = () => {
             setIsModalVisible(false);
             fetchTaskCenters(); // Refresh the list
         } catch (err) {
-            setError("Failed to save task center. Please try again.");
+            message.error("Failed to save task center. Please try again.");
         }
     };
 
@@ -60,7 +58,7 @@ const TaskCenters: React.FC = () => {
             await api.delete(`/task-center/${tcNo}`);
             fetchTaskCenters(); // Refresh the list
         } catch (err) {
-            setError("Failed to delete task center. Please try again.");
+            message.error("Failed to delete task center. Please try again.");
         }
     };
 

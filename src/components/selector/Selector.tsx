@@ -10,6 +10,8 @@ import PartPage from "../part/PartPage";
 import ProductionOrderList from "../production_order/ProductionOrderList";
 import TaskCenterList from "../taskCenter/TaskCenters";
 import StockList from "../stock/StockList";
+import UserMenu from "../UserMenu";
+import {Header} from "antd/es/layout/layout";
 
 const { Sider, Content } = Layout;
 
@@ -64,7 +66,9 @@ const Selector: React.FC = () => {
             </Sider>
             <Layout>
                 <Content style={{ padding: "24px" }}>
+                    <UserMenu/>
                     {renderContent()}
+
                 </Content>
             </Layout>
         </Layout>

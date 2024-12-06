@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col} from "antd";
+import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col, message} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
 import AddOperationModal from "./AddOperationModal";
 import OperationList from "./OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
-import {useError} from "../../context/ErrorContext";
-import {useSuccess} from "../../context/SuccessContext";
 
 const {Search} = Input;
 const {Option} = Select;
@@ -26,8 +24,6 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
     const [taskCenters] = useState<number[]>([106, 107, 108]);
-    const {setError} = useError();
-    const {setSuccess} = useSuccess();
 
     const [filters, setFilters] = useState({
         name: "",
@@ -79,11 +75,11 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
             const response = await api.put(`/part/operation/${selectedPart.number}`, operation);
 
             if (response.status === 201) {
-                setSuccess("Operation successfully added");
+                message.success("Operation successfully added");
             }
             console.log("Operation added successfully:", operation);
         } catch (err) {
-            setError("Failed to add operation. Please try again.");
+            message.error("Failed to add operation. Please try again.");
         }
     };
 

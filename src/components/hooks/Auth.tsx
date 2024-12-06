@@ -1,25 +1,31 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import React, {createContext, useContext, useEffect, useState} from "react";
+import useAuthAxios from "../../utils/authApi";
 
 interface AuthContextType {
     authToken: string | null;
+    setAuthToken: (token: string | null) => void;
+    userEmail: string | null;
     isAuthenticated: boolean;
-    login: (token: string) => void;
+    login: (token: string, userEmail: string) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [authToken, setAuthToken] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const authApi = useAuthAxios();
 
     useEffect(() => {
+        console.log("authToken", authToken);
+        console.log("isAuthenticated", isAuthenticated);
         const token = localStorage.getItem("authToken");
         if (token) {
             // Validate the token with the backend
-            axios
-                .get("http://localhost:8080/auth/validate", {
+            authApi
+                .get("auth/validate", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -33,22 +39,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setIsAuthenticated(false);
                 });
         }
+        console.log("authToken", authToken);
     }, []);
 
-    const login = (token: string) => {
+    const login = (token: string, userEmail: string) => {
         localStorage.setItem("authToken", token);
+        localStorage.setItem("userEmail", userEmail);
         setAuthToken(token);
+        setUserEmail(userEmail);
         setIsAuthenticated(true);
     };
 
     const logout = () => {
         localStorage.removeItem("authToken");
+        localStorage.removeItem("userEmail");
         setAuthToken(null);
         setIsAuthenticated(false);
     };
 
     return (
-        <AuthContext.Provider value={{ authToken, isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{authToken, setAuthToken, userEmail, isAuthenticated, login, logout}}>
             {children}
         </AuthContext.Provider>
     );
