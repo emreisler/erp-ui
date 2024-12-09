@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
-import useAuthAxios from "../../utils/authApi";
+import useAuthAxios from "../utils/authApi";
 
 interface AuthContextType {
     authToken: string | null;
@@ -19,8 +19,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}
     const authApi = useAuthAxios();
 
     useEffect(() => {
-        console.log("authToken", authToken);
-        console.log("isAuthenticated", isAuthenticated);
         const token = localStorage.getItem("authToken");
         if (token) {
             // Validate the token with the backend
@@ -39,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}
                     setIsAuthenticated(false);
                 });
         }
-        console.log("authToken", authToken);
     }, []);
 
     const login = (token: string, userEmail: string) => {

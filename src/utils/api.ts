@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from "axios";
-import {useAuth} from "../components/hooks/Auth";
+import {useAuth} from "../hooks/Auth";
 import {message} from "antd";
 
 
@@ -20,9 +20,9 @@ const useAxios = () => {
         (config) => {
             const token = localStorage.getItem("authToken");
             if (token) {
-                console.log("Token exists:", token);
+                // console.log("Token exists:", token);
                 config.headers.Authorization = `Bearer ${token}`;
-                console.log("Config after setting token:", config);
+                // console.log("Config after setting token:", config);
             }
             return config;
         },

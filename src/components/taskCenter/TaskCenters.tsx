@@ -47,7 +47,8 @@ const TaskCenters: React.FC = () => {
                 await api.put(`/task-center/${selectedTaskCenter.number}`, taskCenter);
             }
             setIsModalVisible(false);
-            fetchTaskCenters(); // Refresh the list
+            message.success("Task center created successfully.");
+            fetchTaskCenters(); // Refresh the list todo FIX this
         } catch (err) {
             message.error("Failed to save task center. Please try again.");
         }

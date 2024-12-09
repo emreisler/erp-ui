@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { LoginUserRequest, LoginUserResponse } from "../types/auth";
 import { useNavigate } from "react-router-dom";
 import useAuthAxios from "../utils/authApi";
-import { useAuth } from "./hooks/Auth";
+import { useAuth } from "../hooks/Auth";
 import {Form, Input, Button, Typography, Alert, Spin, message} from "antd";
 
 const { Title } = Typography;
@@ -31,8 +31,7 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
                     });
                     navigate("/app");
                 } catch (err) {
-                    console.error("Token validation failed:", err);
-                    message.error("Token validation failed");
+                    console.error("Token validation failed, need to login", err);
                     localStorage.removeItem("authToken");
                 }
             }

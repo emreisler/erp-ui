@@ -2,7 +2,7 @@ import React from "react";
 import {Menu, Dropdown, Avatar, Button, Space, message} from "antd";
 import {UserOutlined, SettingOutlined, LogoutOutlined, BellOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "./hooks/Auth";
+import {useAuth} from "../hooks/Auth";
 
 const UserMenu: React.FC = () => {
     const navigate = useNavigate();

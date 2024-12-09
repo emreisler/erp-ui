@@ -16,9 +16,7 @@ import {Header} from "antd/es/layout/layout";
 const { Sider, Content } = Layout;
 
 const Selector: React.FC = () => {
-    const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders" | "task-center">(
-        "parts"
-    );
+    const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders" | "task-center" | "">("parts");
 
     const [collapsed, setCollapsed] = useState(true);
 

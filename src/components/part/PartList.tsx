@@ -93,6 +93,7 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
                 endDate,
             });
             setIsPoModalVisible(false);
+            message.success("Production order successfully created");
         } catch (err) {
             setPoError("Failed to create production order. Please try again.");
         } finally {

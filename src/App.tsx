@@ -3,7 +3,7 @@ import Selector from "./components/selector/Selector";
 import {Route, BrowserRouter as Router, Routes, Navigate} from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import {AuthProvider} from "./components/hooks/Auth";
+import {AuthProvider} from "./hooks/Auth";
 import SettingsPage from "./components/settings/SettingsPage";
 import NotificationsPage from "./components/notifications/NotificationsPage";
 
