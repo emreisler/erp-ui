@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import React, {useEffect, useState} from "react";
+import {Button} from "antd";
+import {PlusOutlined} from "@ant-design/icons";
 import CreatePart from "./CreatePart";
 import useAxios from "../../utils/api";
 import PartList from "./PartList";
@@ -10,11 +10,13 @@ const PartPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isCreatePartVisible, setIsCreatePartVisible] = useState<boolean>(false);
+    const [partCreated, setPartCreated] = useState<boolean>(false);
 
     const api = useAxios();
 
     useEffect(() => {
         if (!isCreatePartVisible) {
+            console.log("isCreatePartVisible:" , isCreatePartVisible);
             const fetchParts = async () => {
                 try {
                     const response = await api.get<Part[]>("/part");
@@ -26,11 +28,14 @@ const PartPage: React.FC = () => {
                 }
             };
             fetchParts();
+        }else{
+            console.log("isCreatePartVisible:" , isCreatePartVisible);
         }
-    }, [isCreatePartVisible]);
+    }, [isCreatePartVisible, partCreated]);
 
     const handlePartCreated = (createdPart: Part) => {
         setIsCreatePartVisible(false); // Hide CreatePart component
+        setPartCreated(true);
     };
 
     if (loading) {
@@ -38,26 +43,30 @@ const PartPage: React.FC = () => {
     }
 
     if (error) {
-        return <p style={{ color: "red" }}>{error}</p>;
+        return <p style={{color: "red"}}>{error}</p>;
     }
 
     return (
         <div>
             {!isCreatePartVisible ? (
                 <>
-                    <div style={{ marginBottom: "16px", textAlign: "left"}}>
+                    <div style={{marginBottom: "16px", textAlign: "left"}}>
                         <Button
                             type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => setIsCreatePartVisible(true)}
+                            icon={<PlusOutlined/>}
+                            onClick={() => {
+                                setIsCreatePartVisible(true)
+                                setPartCreated(false);
+                            }
+                            }
                         >
                             Create New Part
                         </Button>
                     </div>
-                    <PartList parts={parts} />
+                    <PartList parts={parts}/>
                 </>
             ) : (
-                <CreatePart onPartCreated={handlePartCreated} />
+                <CreatePart onPartCreated={handlePartCreated}/>
             )}
         </div>
     );

@@ -5,6 +5,7 @@ import useAxios from "../../utils/api";
 import AddOperationModal from "./AddOperationModal";
 import OperationList from "./OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
+import TaskCenters from "../taskCenter/TaskCenters";
 
 const {Search} = Input;
 const {Option} = Select;
@@ -17,13 +18,15 @@ interface PartListProps {
 }
 
 const PartList: React.FC<PartListProps> = ({parts}) => {
+    console.log("parts being re-rendered");
+    console.log("parts size : ", parts.length);
     const api = useAxios();
     const [selectedPart, setSelectedPart] = useState<Part | null>(null);
     const [poError, setPoError] = useState<string | null>(null);
     const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
-    const [taskCenters] = useState<number[]>([106, 107, 108]);
+    const [taskCenters, setTaskCenters] = useState<number[]>([]);
 
     const [filters, setFilters] = useState({
         name: "",
@@ -32,6 +35,27 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
         projectCode: "",
     });
     const [filteredParts, setFilteredParts] = useState<Part[]>(parts);
+
+    useEffect(() => {
+        const fetchTaskCenters = async () => {
+            try {
+                const response = await api.get<TaskCenter[]>("/task-center");
+                const tcNumbers : number[] = [];
+                response.data.forEach((tc) => {
+                    tcNumbers.push(tc.number);
+                })
+                setTaskCenters(tcNumbers);
+            }catch (error){
+                message.error("Failed to fetch task centers");
+            }
+        }
+        fetchTaskCenters();
+    });
+
+
+    console.log("parts size : ", parts.length);
+
+    console.log("parts size : ", filteredParts.length);
 
     const uniqueCategories = Array.from(new Set(parts.map((part) => part.category)));
     const uniqueProjectCodes = Array.from(new Set(parts.map((part) => part.projectCode)));

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useAxios from "../../utils/api";
-import { Form, Input, Button, Typography, Alert, Select, Spin } from "antd";
+import {Form, Input, Button, Typography, Alert, Select, Spin, message} from "antd";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -29,6 +29,7 @@ const CreatePart: React.FC<CreatePartFormProps> = ({ onPartCreated }) => {
                 setProjects(projectsResponse.data);
                 setCategories(categoriesResponse.data);
             } catch (err) {
+                message.error("could not fetch projects and categories");
                 setError("Failed to fetch projects or categories. Please try again.");
             } finally {
                 setFetchingData(false);
@@ -46,8 +47,10 @@ const CreatePart: React.FC<CreatePartFormProps> = ({ onPartCreated }) => {
             const createdPart = response.data; // Assuming backend returns created part ID
             onPartCreated(createdPart); // Pass partId to parent or EditPartComponent
             form.resetFields();
+            message.success("Part created successfully.");
         } catch (err) {
             setError("Failed to create part. Please try again.");
+            message.error("Could not create part. Please try again.");
         } finally {
             setLoading(false);
         }
