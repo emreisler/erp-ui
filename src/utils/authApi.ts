@@ -29,9 +29,9 @@ const useAuthAxios = () => {
     authApi.interceptors.response.use(
         (response) => response,
         (error) => {
-            if (error.response) {
-                message.error(error.response.data.message || "An unexpected error occurred.")
-            }
+            // if (error.response) {
+            //     message.error(error.response.data.message || "An unexpected error occurred.")
+            // }
             return Promise.reject(error);
         }
     );

@@ -50,7 +50,7 @@ const PartPage: React.FC = () => {
         <div>
             {!isCreatePartVisible ? (
                 <>
-                    <div style={{marginBottom: "16px", textAlign: "left"}}>
+                    <div style={{marginBottom: "16px", textAlign: "center"}}>
                         <Button
                             type="primary"
                             icon={<PlusOutlined/>}

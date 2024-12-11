@@ -50,7 +50,7 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
             }
         }
         fetchTaskCenters();
-    });
+    }, [api]);
 
 
     console.log("parts size : ", parts.length);

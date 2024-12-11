@@ -37,7 +37,7 @@ const TaskCenters: React.FC = () => {
 
     useEffect(() => {
         fetchTaskCenters();
-    }, []);
+    }, [api]);
 
     const handleCreateOrUpdate = async (taskCenter: TaskCenter) => {
         try {
@@ -141,9 +141,14 @@ const TaskCenters: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: 24 }}>
+        <div style={{padding: 24}}>
+            <div style={{marginBottom: 16, textAlign: "center"}}>
+                <Button type="primary" icon={<PlusOutlined/>} onClick={openCreateModal}>
+                    Create New Task Center
+                </Button>
+            </div>
             <Title level={3}>Task Centers</Title>
-            <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Row gutter={16} style={{marginBottom: 16}}>
                 <Col span={8}>
                     <Search
                         placeholder="Search by Name"
@@ -164,18 +169,14 @@ const TaskCenters: React.FC = () => {
                     </Button>
                 </Col>
             </Row>
-            <div style={{ marginBottom: 16, textAlign: "right" }}>
-                <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
-                    Create New Task Center
-                </Button>
-            </div>
+
             <Table
                 bordered
                 dataSource={filteredTaskCenters}
                 columns={columns}
                 rowKey="uuid"
                 loading={loading}
-                pagination={{ pageSize: 10 }}
+                pagination={{pageSize: 10}}
             />
             <Modal
                 title={modalMode === "create" ? "Create Task Center" : "Update Task Center"}
