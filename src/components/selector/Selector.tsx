@@ -12,11 +12,12 @@ import ProductionOrderList from "../production_order/ProductionOrderList";
 import TaskCenterList from "../taskCenter/TaskCenters";
 import StockList from "../stock/StockList";
 import UserMenu from "../UserMenu";
+import AssemblyPage from "../assembly/AssemblyPage";
 
 const {Sider, Content} = Layout;
 
 const Selector: React.FC = () => {
-    const [selected, setSelected] = useState<"parts" | "stocks" | "prod-orders" | "task-center" | "dashboard" | "">("parts");
+    const [selected, setSelected] = useState<"assembly" | "parts" | "stocks" | "prod-orders" | "task-center" | "dashboard" | "">("parts");
 
     const [collapsed, setCollapsed] = useState(false);
 
@@ -26,6 +27,8 @@ const Selector: React.FC = () => {
 
     const renderContent = () => {
         switch (selected) {
+            case "assembly":
+                return <AssemblyPage/>;
             case "parts":
                 return <PartPage/>;
             case "stocks":
@@ -48,8 +51,11 @@ const Selector: React.FC = () => {
                     theme="dark"
                     mode="inline"
                     selectedKeys={[selected]}
-                    onClick={(e) => setSelected(e.key as "parts" | "stocks" | "prod-orders" | "task-center" | "dashboard")}
+                    onClick={(e) => setSelected(e.key as "assembly" | "parts" | "stocks" | "prod-orders" | "task-center" | "dashboard")}
                 >
+                    <Menu.Item key="assembly" icon={<ShopOutlined/>}>
+                        Assembly
+                    </Menu.Item>
                     <Menu.Item key="parts" icon={<AppstoreOutlined/>}>
                         Parts
                     </Menu.Item>
@@ -71,7 +77,6 @@ const Selector: React.FC = () => {
                 <Content style={{padding: "24px"}}>
                     <UserMenu/>
                     {renderContent()}
-
                 </Content>
             </Layout>
         </Layout>

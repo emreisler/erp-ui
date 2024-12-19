@@ -1,7 +1,6 @@
 import React from "react";
 import {Table, Typography, Button} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
-import AddOperationModal from "./AddOperationModal";
 
 const {Text} = Typography;
 
@@ -9,9 +8,10 @@ const {Text} = Typography;
 interface OperationListProps {
     operations: Operation[];
     onAddOperation: () => void;
+    onAddMaterial: () => void;
 }
 
-const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation}) => {
+const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation, onAddMaterial}) => {
     const sortedOperations = [...operations].sort((a, b) =>
         a.sepNumber - b.sepNumber
     );
@@ -53,6 +53,14 @@ const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation
                 onClick={onAddOperation}
             >
                 Add Operation
+            </Button>
+            <Button
+                type="primary"
+                icon={<PlusOutlined/>}
+                style={{marginTop: 16, marginLeft : 16}}
+                onClick={onAddMaterial}
+            >
+                Add Material
             </Button>
         </div>
     );

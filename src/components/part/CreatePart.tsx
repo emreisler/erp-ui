@@ -10,6 +10,7 @@ interface CreatePartFormProps {
 }
 
 const CreatePart: React.FC<CreatePartFormProps> = ({ onPartCreated }) => {
+    console.log("Create Part");
     const [form] = Form.useForm();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);

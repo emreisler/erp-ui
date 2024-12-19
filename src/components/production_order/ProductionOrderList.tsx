@@ -137,6 +137,7 @@ const ProductionOrderList: React.FC = () => {
         { title: "Task Center", dataIndex: "currentTaskCenter", key: "currentTaskCenter" },
         { title: "Quantity", dataIndex: "quantity", key: "quantity" },
         { title: "Status", dataIndex: "status", key: "status" },
+        {title: "End Date", dataIndex: "endDate", key: "endDate" },
         {
             title: "Actions",
             key: "actions",

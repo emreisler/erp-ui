@@ -7,4 +7,5 @@ interface ProductionOrder {
     currentStep: number;
     totalStep: number;
     currentTaskCenter: number;
+    endDate : string;
 }

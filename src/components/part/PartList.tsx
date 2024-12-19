@@ -5,7 +5,6 @@ import useAxios from "../../utils/api";
 import AddOperationModal from "./AddOperationModal";
 import OperationList from "./OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
-import TaskCenters from "../taskCenter/TaskCenters";
 
 const {Search} = Input;
 const {Option} = Select;
@@ -14,12 +13,11 @@ const {Title} = Typography;
 
 
 interface PartListProps {
-    parts: Part[];
+    partCreated: boolean;
 }
 
-const PartList: React.FC<PartListProps> = ({parts}) => {
-    console.log("parts being re-rendered");
-    console.log("parts size : ", parts.length);
+const PartList: React.FC<PartListProps> = ({partCreated}) => {
+    console.log("port list rendered")
     const api = useAxios();
     const [selectedPart, setSelectedPart] = useState<Part | null>(null);
     const [poError, setPoError] = useState<string | null>(null);
@@ -27,6 +25,8 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
+    const [parts, setParts] = useState<Part[]>([]);
+    const [partsLoading, setPartsLoading] = useState<boolean>(true);
 
     const [filters, setFilters] = useState({
         name: "",
@@ -37,25 +37,36 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
     const [filteredParts, setFilteredParts] = useState<Part[]>(parts);
 
     useEffect(() => {
+        const fetchParts = async () => {
+            try {
+                const response = await api.get<Part[]>("/part")
+                setParts(response.data);
+                setFilteredParts(response.data);
+            } catch (error) {
+                message.error("Failed to fetch parts. Please try again later.");
+            }finally {
+                setPartsLoading(false);
+            }
+        }
+        fetchParts();
+    }, [api, partCreated]);
+
+    useEffect(() => {
         const fetchTaskCenters = async () => {
             try {
                 const response = await api.get<TaskCenter[]>("/task-center");
-                const tcNumbers : number[] = [];
+                const tcNumbers: number[] = [];
                 response.data.forEach((tc) => {
                     tcNumbers.push(tc.number);
                 })
                 setTaskCenters(tcNumbers);
-            }catch (error){
+            } catch (error) {
                 message.error("Failed to fetch task centers");
             }
         }
         fetchTaskCenters();
     }, [api]);
 
-
-    console.log("parts size : ", parts.length);
-
-    console.log("parts size : ", filteredParts.length);
 
     const uniqueCategories = Array.from(new Set(parts.map((part) => part.category)));
     const uniqueProjectCodes = Array.from(new Set(parts.map((part) => part.projectCode)));
@@ -224,6 +235,7 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
                 dataSource={filteredParts}
                 columns={columns}
                 rowKey="uuid"
+                loading={partsLoading}
                 expandable={{
                     expandedRowRender: (record) => (
                         <OperationList
@@ -232,6 +244,7 @@ const PartList: React.FC<PartListProps> = ({parts}) => {
                                 setSelectedPart(record);
                                 setIsAddOperationModalVisible(true);
                             }}
+                            onAddMaterial={() => setSelectedPart(record)}
                         />
                     ),
                 }}
