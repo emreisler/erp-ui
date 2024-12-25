@@ -37,6 +37,7 @@ const useAxios = () => {
         (error) => {
             if (error.response) {
                 if (error.response && error.response.status === 401) {
+                    console.log("navigating to login")
                     navigate("/login");
                     return;
                 }

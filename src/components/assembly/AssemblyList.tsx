@@ -4,6 +4,8 @@ import {Button, message, Space, Table} from "antd";
 import OperationList from "../part/OperationList";
 import {PlusOutlined} from "@ant-design/icons";
 import AddOperationModal from "../part/AddOperationModal";
+import PartDetailsModal from "../part/PartDetails";
+import AssemblyDetailsModal from "./AssemblyDetailsModal";
 
 type AssemblyListProps = {
     assemblyCreated: boolean;
@@ -16,6 +18,7 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
     const [selectedAssembly, setSelectedAssembly] = useState<Assembly | null>(null);
     const [addOperation, setAddOperation] = useState<boolean>(false);
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
+    const [isAssemblyModalVisible, setIsAssemblyDetailsModalVisible] = useState<boolean>(false);
 
     const api = useAxios();
 
@@ -67,6 +70,11 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
         fetchAssemblies();
     }, [api, assemblyCreated, addOperation]);
 
+    const closeAssemblyDetailsModal = () => {
+        setIsAssemblyDetailsModalVisible(false);
+        setSelectedAssembly(null);
+    }
+
     const columns = [
         {
             title: "Number",
@@ -101,6 +109,15 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                     >
                         Create Production Order
                     </Button>
+                    <Button
+                        icon={<PlusOutlined/>}
+                        onClick={() => {
+                            setIsAssemblyDetailsModalVisible(true);
+                            setSelectedAssembly(record);
+                        }}
+                    >
+                        Details
+                    </Button>
                 </Space>
             ),
         },
@@ -118,11 +135,6 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                     expandedRowRender: (record: Assembly) => (
                         <OperationList
                             operations={record.operationList}
-                            // onAddOperation={() => {
-                            //     setSelectedAssembly(record);
-                            //     setAddOperation(true);
-                            // }}
-                            // onAddMaterial={() => setSelectedAssembly(record)}
                         />
                     ),
                 }}
@@ -135,6 +147,11 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                 onAddOperation={handleAddOperation}
                 taskCenters={taskCenters}
             />
+            {selectedAssembly &&             <AssemblyDetailsModal
+                visible={isAssemblyModalVisible}
+                onClose={closeAssemblyDetailsModal}
+                assembly={selectedAssembly}
+            />}
         </div>
 
     )

@@ -3,8 +3,6 @@ import AssemblyList from "./AssemblyList";
 import {Button} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import CreateAssembly from "./CreateAssembly";
-import createAssembly from "./CreateAssembly";
-
 
 const AssemblyPage: React.FC = () => {
 
