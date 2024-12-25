@@ -5,4 +5,5 @@ interface Part {
     category : string;
     name: string;
     operationList: Operation[];
+    stockList: Stock[];
 }

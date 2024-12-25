@@ -3,12 +3,18 @@ import AssemblyList from "./AssemblyList";
 import {Button} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import CreateAssembly from "./CreateAssembly";
+import createAssembly from "./CreateAssembly";
 
 
 const AssemblyPage: React.FC = () => {
 
     const [assemblyCreated, setAssemblyCreated] = useState<boolean>(false);
     const [createAssemblyModalVisible, setCreateAssemblyModalVisible] = useState<boolean>(false);
+
+    const handleAssemblyCreated = (createdAssembly: Assembly) => {
+        setCreateAssemblyModalVisible(false); // Hide Create assembly component
+        setAssemblyCreated(true);
+    };
 
     return (
         <div>
@@ -30,7 +36,7 @@ const AssemblyPage: React.FC = () => {
                     <AssemblyList assemblyCreated={assemblyCreated}/>
                 </>
             ) : (
-                <CreateAssembly/>
+                <CreateAssembly onAssemblyCreated={handleAssemblyCreated}/>
             )}
         </div>
     );

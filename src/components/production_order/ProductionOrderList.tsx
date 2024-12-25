@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Table, Typography, Alert, Space, Button, Modal, List, Card, message } from "antd";
+import React, {useState, useEffect} from "react";
+import {Table, Typography, Alert, Space, Button, Modal, List, Card, message} from "antd";
 import useAxios from "../../utils/api";
-import { EyeOutlined } from "@ant-design/icons";
+import {EyeOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
 
-const { Title } = Typography;
+const {Title} = Typography;
 
 const ProductionOrderList: React.FC = () => {
     console.log("ProductionOrderList rendered");
@@ -33,25 +33,24 @@ const ProductionOrderList: React.FC = () => {
                 userEmail: operation.userEmail || "example@example.com",
             };
 
-            const response = await api.put("/stamp", stamp);
+            const response = await api.put("/production-orders/stamp", stamp);
 
             if (response.status === 201) {
                 message.success("Operation successfully added");
                 navigate("/login")
-            }else if (response.status >= 400){
+            } else if (response.status >= 400) {
                 message.error("Operation failed");
                 navigate("/login")
             }
 
             setOperations((prevOperations) =>
                 prevOperations.map((op) =>
-                    op.sepNumber === operation.sepNumber ? { ...op, isStamped: true } : op
+                    op.sepNumber === operation.sepNumber ? {...op, isStamped: true} : op
                 )
             );
 
             message.success(`Operation ${operation.sepNumber} stamped successfully.`);
         } catch (error) {
-            console.error("Error stamping operation:", error);
             message.error("Failed to stamp the operation. Please try again.");
         }
     };
@@ -69,7 +68,7 @@ const ProductionOrderList: React.FC = () => {
         };
 
         fetchProductionOrders();
-    }, [api]);
+    }, [api, stamps]);
 
     useEffect(() => {
         if (selectedOrder) {
@@ -97,7 +96,7 @@ const ProductionOrderList: React.FC = () => {
     const fetchStampedOperations = async (orderCode: string) => {
         setStampsLoading(true);
         try {
-            const response = await api.get(`/stamp/${orderCode}`);
+            const response = await api.get(`/production-orders/stamp/${orderCode}`);
             setStamps(response.data);
         } catch (err) {
             setError("Failed to load stamps for the selected production order.");
@@ -109,7 +108,7 @@ const ProductionOrderList: React.FC = () => {
     const fetchOperations = async (partNo: string) => {
         setOperationsLoading(true);
         try {
-            const response = await api.get(`/operations/part-no/${partNo}`);
+            const response = await api.get(`/part/operation/${partNo}`);
             setOperations(response.data);
         } catch (err) {
             setError("Failed to fetch operations. Please try again.");
@@ -131,19 +130,19 @@ const ProductionOrderList: React.FC = () => {
     };
 
     const columns = [
-        { title: "Order Code", dataIndex: "code", key: "code" },
-        { title: "Part Number", dataIndex: "partNumber", key: "partNumber" },
-        { title: "Step", dataIndex: "currentStep", key: "currentStep" },
-        { title: "Task Center", dataIndex: "currentTaskCenter", key: "currentTaskCenter" },
-        { title: "Quantity", dataIndex: "quantity", key: "quantity" },
-        { title: "Status", dataIndex: "status", key: "status" },
-        {title: "End Date", dataIndex: "endDate", key: "endDate" },
+        {title: "Order Code", dataIndex: "code", key: "code"},
+        {title: "Part Number", dataIndex: "partNumber", key: "partNumber"},
+        {title: "Step", dataIndex: "currentStep", key: "currentStep"},
+        {title: "Task Center", dataIndex: "currentTaskCenter", key: "currentTaskCenter"},
+        {title: "Quantity", dataIndex: "quantity", key: "quantity"},
+        {title: "Status", dataIndex: "status", key: "status"},
+        {title: "End Date", dataIndex: "endDate", key: "endDate"},
         {
             title: "Actions",
             key: "actions",
             render: (_: any, record: ProductionOrder) => (
                 <Button
-                    icon={<EyeOutlined />}
+                    icon={<EyeOutlined/>}
                     onClick={() => showModal(record)}
                     type="default"
                 />
@@ -152,16 +151,16 @@ const ProductionOrderList: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: 24 }}>
+        <div style={{padding: 24}}>
             <Title level={3}>Production Orders</Title>
-            {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+            {error && <Alert message={error} type="error" showIcon style={{marginBottom: 16}}/>}
             <Table
                 dataSource={productionOrders}
                 columns={columns}
                 rowKey="orderId"
                 loading={loading}
                 bordered
-                pagination={{ pageSize: 10 }}
+                pagination={{pageSize: 10}}
             />
 
             <Modal
@@ -175,7 +174,7 @@ const ProductionOrderList: React.FC = () => {
                     <p>Loading stamps...</p>
                 ) : (
                     <List
-                        grid={{ gutter: 16, column: 1 }}
+                        grid={{gutter: 16, column: 1}}
                         dataSource={operations}
                         renderItem={(operation) => (
                             <List.Item
@@ -189,7 +188,7 @@ const ProductionOrderList: React.FC = () => {
                                 }}
                             >
                                 {/* Compact horizontal layout */}
-                                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+                                <div style={{display: "flex", gap: "20px", flexWrap: "wrap"}}>
                                     <span><strong>Step:</strong> {operation.sepNumber}</span>
                                     <span><strong>User:</strong> {operation.userEmail || "N/A"}</span>
                                     <span><strong>Order Code:</strong> {operation.taskCenterNo}</span>
@@ -201,7 +200,7 @@ const ProductionOrderList: React.FC = () => {
                                         <Button
                                             type="primary"
                                             onClick={() => handleStampOperation(operation, selectedOrder)}
-                                            style={{ marginRight: "10px" }}
+                                            style={{marginRight: "10px"}}
                                         >
                                             Stamp
                                         </Button>
