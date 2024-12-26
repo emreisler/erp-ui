@@ -3,10 +3,21 @@ interface Assembly {
     number: string
     name: string
     projectCode: string
-    partList: Part[];
+    attachedParts: AttachPartModalState[];
     operationList: Operation[];
-    stockList: Stock[];
+    stockList: AttachedStockModalState[];
     createdAt: Date | null;
     updatedAt: Date | null;
 
+}
+
+interface AttachPartModalState {
+    partNumber: string
+    quantity: number
+}
+
+interface AttachedStockModalState {
+    code: string
+    name: string
+    quantity: number
 }

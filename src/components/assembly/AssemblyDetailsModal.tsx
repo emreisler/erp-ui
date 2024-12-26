@@ -5,6 +5,9 @@ import OperationList from "../part/OperationList"
 import useAxios from "../../utils/api";
 import AddOperationModal from "../part/AddOperationModal";
 import AddMaterialModal from "../part/AddMaterialModal";
+import AttachPartModal from "./AttachPartModal";
+import AttachedPartList from "./AttachedPartList";
+import AttachedMaterialList from "./AttachedMaterialList";
 
 const {Title} = Typography;
 
@@ -15,10 +18,10 @@ interface AssemblyDetailsModalProps {
 }
 
 const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
-                                                               visible,
-                                                               onClose,
-                                                               assembly,
-                                                           }) => {
+                                                                       visible,
+                                                                       onClose,
+                                                                       assembly,
+                                                                   }) => {
     console.log("part details rendered");
     const api = useAxios();
     const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
@@ -26,8 +29,8 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
     const [isAddPartModalVisible, setIsAddPartModalVisible] = useState<boolean>(false);
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
     const [operations, setOperations] = useState<Operation[]>([])
-    const [materials, setMaterials] = useState<Stock[]>([]);
-    const [parts, setParts] = useState<Part[]>([]);
+    const [materials, setMaterials] = useState<AttachedStockModalState[]>([]);
+    const [attachedParts, setAttachedParts] = useState<AttachPartModalState[]>([]);
 
     useEffect(() => {
         console.log("fetching operations");
@@ -46,7 +49,7 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
         console.log("fetching stocks");
         const fetchStocks = async () => {
             try {
-                const response = await api.get<Stock[]>(`/assembly/stock/${assembly?.number}`);
+                const response = await api.get<AttachedStockModalState[]>(`/assembly/stock/${assembly?.number}`);
                 setMaterials(response.data);
             } catch (error) {
                 message.error("Failed to fetch stocks");
@@ -59,8 +62,8 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
         console.log("fetching parts");
         const fetchParts = async () => {
             try {
-                const response = await api.get<Part[]>(`/assembly/part/${assembly?.number}`);
-                setParts(response.data);
+                const response = await api.get<AttachPartModalState[]>(`/assembly/part/${assembly?.number}`);
+                setAttachedParts(response.data);
             } catch (error) {
                 message.error("Failed to fetch parts");
             }
@@ -115,15 +118,16 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
         }
     };
 
-    const handleAddPart = async (part: Part) => {
+
+    const handleAddPart = async (attachPart: AttachPartModalState) => {
         if (!assembly) return;
         try {
-            const response = await api.put(`/assembly/part/${assembly.number}`, part);
+            const response = await api.put(`/assembly/part/${assembly.number}`, attachPart);
 
             if (response.status === 201) {
                 message.success("Material successfully added");
             }
-            console.log("Material added successfully:", part);
+            console.log("Material added successfully:", attachPart);
         } catch (err) {
             message.error("Failed to add operation. Please try again.");
         }
@@ -139,18 +143,19 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
             footer={null}
             width={800}
         >
+
             <Title level={5} style={{marginTop: 32}}>
+                Attached Parts
+            </Title>
+            <AttachedPartList attachedParts={attachedParts}/>
+
+            <Title level={5} style={{marginTop: 5}}>
                 Materials
             </Title>
-            <List
-                dataSource={materials}
-                renderItem={(material) => (
-                    <List.Item>{material.code} - {material.name}</List.Item>
-                )}
-                bordered
-            />
+            <AttachedMaterialList attachedMaterials={materials}/>
             <Title level={5}>Operations</Title>
-            <OperationList operations={operations} />
+            <OperationList operations={operations}/>
+
             <Space style={{marginTop: 16}}>
                 <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
                     setIsAddOperationModalVisible(true)
@@ -181,6 +186,9 @@ const AssemblyDetailsModal: React.FC<AssemblyDetailsModalProps> = ({
                 onClose={() => setIsAddMaterialModalVisible(false)}
                 onAddMaterial={handleAddMaterial}
             />
+            <AttachPartModal visible={isAddPartModalVisible} onClose={() => {
+                setIsAddPartModalVisible(false)
+            }} onAddPart={handleAddPart} assembly={assembly}/>
         </Modal>
     );
 };

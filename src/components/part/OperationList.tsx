@@ -1,14 +1,11 @@
 import React from "react";
 import {Table, Typography, Button} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 
 
 interface OperationListProps {
     operations: Operation[];
-    // onAddOperation: () => void;
-    // onAddMaterial: () => void;
 }
 
 const OperationList: React.FC<OperationListProps> = ({operations}) => {
@@ -46,22 +43,6 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
                 <Text type="secondary">No operations available for this part.</Text>
             )}
             <br/>
-            {/*<Button*/}
-            {/*    type="primary"*/}
-            {/*    icon={<PlusOutlined/>}*/}
-            {/*    style={{marginTop: 16}}*/}
-            {/*    onClick={onAddOperation}*/}
-            {/*>*/}
-            {/*    Add Operation*/}
-            {/*</Button>*/}
-            {/*<Button*/}
-            {/*    type="primary"*/}
-            {/*    icon={<PlusOutlined/>}*/}
-            {/*    style={{marginTop: 16, marginLeft : 16}}*/}
-            {/*    onClick={onAddMaterial}*/}
-            {/*>*/}
-            {/*    Add Material*/}
-            {/*</Button>*/}
         </div>
     );
 };

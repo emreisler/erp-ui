@@ -6,6 +6,7 @@ import {PlusOutlined} from "@ant-design/icons";
 import AddOperationModal from "../part/AddOperationModal";
 import PartDetailsModal from "../part/PartDetails";
 import AssemblyDetailsModal from "./AssemblyDetailsModal";
+import CreateProductionOrderModal from "../part/CreateProductionOrderModal";
 
 type AssemblyListProps = {
     assemblyCreated: boolean;
@@ -19,6 +20,8 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
     const [addOperation, setAddOperation] = useState<boolean>(false);
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
     const [isAssemblyModalVisible, setIsAssemblyDetailsModalVisible] = useState<boolean>(false);
+    const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const api = useAxios();
 
@@ -74,6 +77,24 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
         setIsAssemblyDetailsModalVisible(false);
         setSelectedAssembly(null);
     }
+
+    const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
+        setLoading(true);
+        try {
+            await api.post("/production-orders", {
+                partNo: partNumber,
+                quantity,
+                endDate,
+            });
+            setIsPoModalVisible(false);
+            message.success("Production order successfully created");
+        }catch (error){
+
+        }finally {
+            setLoading(false);
+        }
+
+    };
 
     const columns = [
         {
@@ -147,11 +168,20 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                 onAddOperation={handleAddOperation}
                 taskCenters={taskCenters}
             />
-            {selectedAssembly &&             <AssemblyDetailsModal
+            {selectedAssembly && <AssemblyDetailsModal
                 visible={isAssemblyModalVisible}
                 onClose={closeAssemblyDetailsModal}
                 assembly={selectedAssembly}
             />}
+            {selectedAssembly && (
+                <CreateProductionOrderModal
+                    visible={isPoModalVisible}
+                    part={selectedAssembly}
+                    onClose={() => setIsPoModalVisible(false)}
+                    onCreate={handleCreateProductionOrder}
+                    loading={loading}
+                />
+            )}
         </div>
 
     )
