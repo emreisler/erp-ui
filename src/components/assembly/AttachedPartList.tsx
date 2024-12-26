@@ -1,15 +1,33 @@
-import React from "react";
-import {Table, Typography, Button} from "antd";
+import React, {useEffect, useState} from "react";
+import {Table, Typography, Button, message, Space} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
+import useAxios from "../../utils/api";
 
 const {Text} = Typography;
 
 
 interface AttachedPartList {
-    attachedParts: AttachPartModalState[];
+    attachedParts : AttachPartModalState[]
+}
+
+function EditOutlined() {
+    return null;
+}
+
+function DeleteOutlined() {
+    return null;
 }
 
 const AttachedPartList: React.FC<AttachedPartList> = ({attachedParts}) => {
+
+
+    const handleEdit = (attachedPart : AttachPartModalState) => {
+        console.log("edit");
+    }
+
+    const handleDelete = (attachedPart : AttachPartModalState) => {
+        console.log("delete");
+    }
 
     const columns = [
         {
@@ -21,6 +39,25 @@ const AttachedPartList: React.FC<AttachedPartList> = ({attachedParts}) => {
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: AttachPartModalState) => (
+                <Space>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(record)}
+                    />
+                    <Button
+                        type="primary"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record)}
+                    />
+                </Space>
+            ),
         },
     ];
 
@@ -34,7 +71,7 @@ const AttachedPartList: React.FC<AttachedPartList> = ({attachedParts}) => {
                     pagination={false}
                 />
             ) : (
-                <Text type="secondary">No operations available for this part.</Text>
+                <Text type="secondary">No attached part available for this part.</Text>
             )}
             <br/>
         </div>

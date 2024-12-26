@@ -44,7 +44,7 @@ export const generateProductionOrderPDF = async (
 
     partDetails.operationList.forEach((operation, index) => {
         doc.setFontSize(12);
-        doc.text(`Step ${operation.sepNumber}: ${operation.taskCenterNo}`, 10, startY);
+        doc.text(`Step ${operation.stepNumber}: ${operation.taskCenterNo}`, 10, startY);
         startY += 8;
         doc.setFont("times", "italic");
         doc.text(`  - ${operation.description}`, 10, startY);

@@ -9,7 +9,6 @@ interface AttachPartModalProps {
     visible: boolean;
     onClose: () => void;
     onAddPart: (attachPart: AttachPartModalState) => void;
-    assembly: Assembly
 }
 
 
@@ -18,7 +17,7 @@ const AttachPartModal: React.FC<AttachPartModalProps> = ({
                                                              visible,
                                                              onClose,
                                                              onAddPart,
-                                                             assembly
+
                                                          }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);

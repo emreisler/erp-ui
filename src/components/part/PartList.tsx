@@ -1,10 +1,14 @@
 import React, {useEffect, useState} from "react";
-import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col, message} from "antd";
+import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col, message, Tabs} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
-import OperationList from "./OperationList";
+import OperationList from "../operation/OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
-import PartDetailsModal from "./PartDetails";
+import dayjs from "dayjs";
+import AttachedMaterialList from "../assembly/AttachedMaterialList";
+import AttachedPartList from "../assembly/AttachedPartList";
+import AddOperationModal from "../operation/AddOperationModal";
+import AddMaterialModal from "./AddMaterialModal";
 
 const {Option} = Select;
 
@@ -19,26 +23,19 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     console.log("port list rendered")
     const api = useAxios();
     const [selectedPart, setSelectedPart] = useState<Part | null>(null);
+    const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
+    const [isAddMaterialModalVisible, setIsAddMaterialModalVisible] = useState<boolean>(false);
+    const [operations, setOperations] = useState<Operation[]>([])
+    const [materials, setMaterials] = useState<AttachedStockModalState[]>([]);
     const [poError, setPoError] = useState<string | null>(null);
     const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [parts, setParts] = useState<Part[]>([]);
     const [partsLoading, setPartsLoading] = useState<boolean>(true);
-
-    const [filters, setFilters] = useState({
-        name: "",
-        number: "",
-        category: "",
-        projectCode: "",
-    });
-    const [filteredParts, setFilteredParts] = useState<Part[]>(parts);
+    const [taskCenters, setTaskCenters] = useState<number[]>([]);
 
     const [isPartDetailsModalVisible, setIsPartDetailsModalVisible] = useState<boolean>(false);
 
-    const openPartDetailsModal = (part: Part) => {
-        setSelectedPart(part);
-        setIsPartDetailsModalVisible(true);
-    };
 
     const closePartDetailsModal = () => {
         setIsPartDetailsModalVisible(false);
@@ -46,11 +43,26 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     };
 
     useEffect(() => {
+        const fetchTaskCenters = async () => {
+            try {
+                const response = await api.get<TaskCenter[]>("/task-center");
+                const tcNumbers: number[] = [];
+                response.data.forEach((tc) => {
+                    tcNumbers.push(tc.number);
+                })
+                setTaskCenters(tcNumbers);
+            } catch (error) {
+                message.error("Failed to fetch task centers");
+            }
+        }
+        fetchTaskCenters();
+    }, [api]);
+
+    useEffect(() => {
         const fetchParts = async () => {
             try {
                 const response = await api.get<Part[]>("/part")
                 setParts(response.data);
-                setFilteredParts(response.data);
             } catch (error) {
                 message.error("Failed to fetch parts. Please try again later.");
             } finally {
@@ -62,40 +74,6 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
 
 
 
-    const uniqueCategories = Array.from(new Set(parts.map((part) => part.category)));
-    const uniqueProjectCodes = Array.from(new Set(parts.map((part) => part.projectCode)));
-
-    const handleSearch = () => {
-        const regex = (value: string) => new RegExp(`^${value.replace("*", ".*")}`, "i"); // Match from the start
-        const filtered = parts.filter((part) => {
-            return (
-                (!filters.name || regex(filters.name).test(part.name)) &&
-                (!filters.number || regex(filters.number).test(part.number)) &&
-                (!filters.category || part.category === filters.category) &&
-                (!filters.projectCode || part.projectCode === filters.projectCode)
-            );
-        });
-        setFilteredParts(filtered);
-    };
-
-
-    const resetFilters = () => {
-        setFilters({
-            name: "",
-            number: "",
-            category: "",
-            projectCode: "",
-        });
-        setFilteredParts(parts); // Reset to the original list
-    };
-
-    useEffect(() => {
-        handleSearch(); // Trigger search whenever filters change
-    }, [filters]);
-
-    const handleFilterChange = (field: keyof typeof filters, value: string) => {
-        setFilters((prevFilters) => ({...prevFilters, [field]: value}));
-    };
 
 
     const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
@@ -114,6 +92,45 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
             setLoading(false);
         }
     };
+
+    const handleAddOperation = async (operation: Operation) => {
+        if (!selectedPart) return;
+        try {
+            const response = await api.put(`/part/operation/${selectedPart?.number}`, operation);
+
+            if (response.status === 201) {
+                message.success("Operation successfully added");
+                setOperations(prevOperations => [...prevOperations, operation]);
+                selectedPart.operationList.push(operation);
+            }
+            console.log("Operation added successfully:", operation);
+        } catch (err) {
+            message.error("Failed to add operation. Please try again.");
+            console.log("err:", err)
+        }
+    };
+
+    const handleAddMaterial = async (stock: Stock) => {
+        if (!selectedPart) return;
+        try {
+            const response = await api.put<Part>(`/part/stock/${selectedPart?.number}`, stock);
+
+            if (response.status === 201) {
+                message.success("Material successfully added");
+                setMaterials(prevMaterials => [...prevMaterials, stock]);
+                selectedPart.stocksList.push(stock);
+            }
+            console.log("Material added successfully:", stock);
+
+        } catch (err) {
+            message.error("Failed to add material. Please try again.");
+            console.log("err:", err)
+        }
+    };
+
+    const onUpdateOperation = (updatedOperation: Operation) => {
+        message.warning("Operation update is not supported yet.");
+    }
 
     const columns = [
         {
@@ -137,6 +154,12 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
             key: "category",
         },
         {
+            title: "Updated At",
+            dataIndex: "updatedAt",
+            key: "updatedAt",
+            render: (text: string) => dayjs(text).format("YYYY MMM DD HH:mm:ss"), // Format Updated At
+        },
+        {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Part) => (
@@ -150,17 +173,6 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                     >
                         Create Production Order
                     </Button>
-                    <Button
-                        icon={<PlusOutlined />}
-                        onClick={() =>{
-                            console.log("setting up")
-                            setSelectedPart(record);
-                            setIsPartDetailsModalVisible(true);
-                            console.log("isPartDetailsModalVisible" + isPartDetailsModalVisible);
-                    }}
-                    >
-                        View Details
-                    </Button>
                 </Space>
             ),
         },
@@ -168,81 +180,50 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
 
     return (
         <div style={{padding: 24}}>
-            <Title level={3}>Parts List</Title>
             {poError && <Alert message={poError} type="error" showIcon style={{marginBottom: 16}}/>}
-            <Row gutter={16} style={{marginBottom: 16}}>
-                <Col span={6}>
-                    <Input
-                        placeholder="Search by Number"
-                        value={filters.number}
-                        onChange={(e) => handleFilterChange("number", e.target.value)}
-                    />
-                </Col>
-                <Col span={6}>
-                    <Input
-                        placeholder="Search by Name"
-                        value={filters.name}
-                        onChange={(e) => handleFilterChange("name", e.target.value)}
-                    />
-                </Col>
-                <Col span={6}>
-                    <Select
-                        placeholder="Filter by Category"
-                        value={filters.category}
-                        onChange={(value) => handleFilterChange("category", value || "")}
-                        allowClear
-                        style={{width: "100%"}}
-                    >
-                        {uniqueCategories.map((category) => (
-                            <Option key={category} value={category}>
-                                {category}
-                            </Option>
-                        ))}
-                    </Select>
-                </Col>
-                <Col span={6}>
-                    <Select
-                        placeholder="Filter by Project Code"
-                        value={filters.projectCode}
-                        onChange={(value) => handleFilterChange("projectCode", value || "")}
-                        allowClear
-                        style={{width: "100%"}}
-                    >
-                        {uniqueProjectCodes.map((code) => (
-                            <Option key={code} value={code}>
-                                {code}
-                            </Option>
-                        ))}
-                    </Select>
-                </Col>
-            </Row>
-            <Space style={{marginBottom: 16}}>
-                <Button type="primary" onClick={resetFilters}>
-                    Reset Filters
-                </Button>
-            </Space>
             <Table
-                dataSource={filteredParts}
+                dataSource={parts}
                 columns={columns}
                 rowKey="uuid"
                 loading={partsLoading}
                 expandable={{
-                    expandedRowRender: (record) => (
-                        <OperationList
-                            operations={record.operationList}
-
-
-                        />
+                    expandedRowRender: (record: Part) => (
+                        <Tabs defaultActiveKey="operations">
+                            <Tabs.TabPane tab="Operations" key="operations">
+                                <OperationList operations={record.operationList}/>
+                                <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
+                                    setIsAddOperationModalVisible(true);
+                                    setSelectedPart(record);
+                                }}>
+                                    Add Operation
+                                </Button>
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="Materials" key="materials">
+                                <AttachedMaterialList attachedMaterials={record.stocksList}/>
+                                <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
+                                    setIsAddMaterialModalVisible(true);
+                                    setSelectedPart(record);
+                                }}>
+                                    Attach Material
+                                </Button>
+                            </Tabs.TabPane>
+                        </Tabs>
                     ),
                 }}
                 bordered
                 pagination={{pageSize: 10}}
             />
-            {selectedPart &&             <PartDetailsModal
-                visible={isPartDetailsModalVisible}
-                onClose={closePartDetailsModal}
-                part={selectedPart}
-            />}
+            <AddOperationModal
+                visible={isAddOperationModalVisible}
+                onClose={() => setIsAddOperationModalVisible(false)}
+                onAddOperation={handleAddOperation}
+                taskCenters={taskCenters}
+            />
+            <AddMaterialModal
+                visible={isAddMaterialModalVisible}
+                onClose={() => setIsAddMaterialModalVisible(false)}
+                onAddMaterial={handleAddMaterial}
+            />
 
             {selectedPart && (
                 <CreateProductionOrderModal

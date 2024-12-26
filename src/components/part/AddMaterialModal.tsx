@@ -71,7 +71,7 @@ const AddMaterialModal: React.FC<AddOperationModalProps> = ({
                     <Input type="number" placeholder="Enter quantity" />
                 </Form.Item>
                 <Form.Item
-                    label="Stock"
+                    label="Material"
                     name="code"
                     rules={[{ required: true, message: "Please select a task center!" }]}
                 >
