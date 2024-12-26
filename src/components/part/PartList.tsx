@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col, message} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
-import OperationList from "./OperationList";
+import OperationList from "../operation/OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
 import PartDetailsModal from "./PartDetails";
 
@@ -114,6 +114,10 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
             setLoading(false);
         }
     };
+
+    const onUpdateOperation = (updatedOperation: Operation) => {
+        message.warning("Operation update is not supported yet.");
+    }
 
     const columns = [
         {
@@ -230,8 +234,10 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                     expandedRowRender: (record) => (
                         <OperationList
                             operations={record.operationList}
-
-
+                            onAddOperation={() => {
+                                message.warning("add operation is not supported here")
+                            }}
+                            onUpdateOperation={onUpdateOperation}
                         />
                     ),
                 }}

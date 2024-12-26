@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from "react";
 import useAxios from "../../utils/api";
-import {Button, message, Space, Table} from "antd";
-import OperationList from "../part/OperationList";
+import {Button, message, Space, Table,Tabs} from "antd";
+import OperationList from "../operation/OperationList";
 import {PlusOutlined} from "@ant-design/icons";
-import AddOperationModal from "../part/AddOperationModal";
+import AddOperationModal from "../operation/AddOperationModal";
 import PartDetailsModal from "../part/PartDetails";
-import AssemblyDetailsModal from "./AssemblyDetailsModal";
+// import AssemblyDetailsModal from "./AssemblyDetailsModal";
 import CreateProductionOrderModal from "../part/CreateProductionOrderModal";
+import AttachedMaterialList from "./AttachedMaterialList";
+import AttachedPartList from "./AttachedPartList";
 
 type AssemblyListProps = {
     assemblyCreated: boolean;
@@ -22,8 +24,57 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
     const [isAssemblyModalVisible, setIsAssemblyDetailsModalVisible] = useState<boolean>(false);
     const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const [operations, setOperations] = useState<Operation[]>([])
+    const [materials, setMaterials] = useState<AttachedStockModalState[]>([]);
+    const [attachedParts, setAttachedParts] = useState<AttachPartModalState[]>([]);
 
     const api = useAxios();
+
+    useEffect(() => {
+        if (selectedAssembly != null){
+            console.log("fetching operations");
+            const fetchOperations = async () => {
+                try {
+                    const response = await api.get<Operation[]>(`/assembly/operation/${selectedAssembly?.number}`);
+                    setOperations(response.data);
+                } catch (error) {
+                    message.error("Failed to fetch oeprations");
+                }
+            }
+            fetchOperations();
+        }
+
+    }, [api]);
+
+    useEffect(() => {
+        if (selectedAssembly != null){
+            console.log("fetching stocks");
+            const fetchStocks = async () => {
+                try {
+                    const response = await api.get<AttachedStockModalState[]>(`/assembly/stock/${selectedAssembly?.number}`);
+                    setMaterials(response.data);
+                } catch (error) {
+                    message.error("Failed to fetch stocks");
+                }
+            }
+            fetchStocks();
+        }
+    }, [api]);
+
+    useEffect(() => {
+        console.log("fetching parts");
+        if (selectedAssembly != null){
+            const fetchParts = async () => {
+                try {
+                    const response = await api.get<AttachPartModalState[]>(`/assembly/part/${selectedAssembly?.number}`);
+                    setAttachedParts(response.data);
+                } catch (error) {
+                    message.error("Failed to fetch parts");
+                }
+            }
+            fetchParts();
+        }
+    }, [api]);
 
     const handleAddOperation = async (operation: Operation) => {
         if (!selectedAssembly) return;
@@ -77,6 +128,11 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
         setIsAssemblyDetailsModalVisible(false);
         setSelectedAssembly(null);
     }
+
+    const onUpdateOperation = (updatedOperation: Operation) => {
+        message.warning("Operation update is not supported yet.");
+    }
+
 
     const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
         setLoading(true);
@@ -154,9 +210,17 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                 loading={assemblyListLoading}
                 expandable={{
                     expandedRowRender: (record: Assembly) => (
-                        <OperationList
-                            operations={record.operationList}
-                        />
+                        <Tabs defaultActiveKey="operations">
+                            <Tabs.TabPane tab="Operations" key="operations">
+                                <OperationList operations={record.operationList} onAddOperation={handleAddOperation} onUpdateOperation={onUpdateOperation} />
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="Materials" key="materials">
+                                <AttachedMaterialList attachedMaterials={materials}/>
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="Attached Part" key="attached-part">
+                                <AttachedPartList selectedAssembly={record} />
+                            </Tabs.TabPane>
+                        </Tabs>
                     ),
                 }}
                 bordered
@@ -168,11 +232,11 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
                 onAddOperation={handleAddOperation}
                 taskCenters={taskCenters}
             />
-            {selectedAssembly && <AssemblyDetailsModal
-                visible={isAssemblyModalVisible}
-                onClose={closeAssemblyDetailsModal}
-                assembly={selectedAssembly}
-            />}
+            {/*{selectedAssembly && <AssemblyDetailsModal*/}
+            {/*    visible={isAssemblyModalVisible}*/}
+            {/*    onClose={closeAssemblyDetailsModal}*/}
+            {/*    assembly={selectedAssembly}*/}
+            {/*/>}*/}
             {selectedAssembly && (
                 <CreateProductionOrderModal
                     visible={isPoModalVisible}

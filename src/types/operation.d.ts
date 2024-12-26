@@ -1,4 +1,5 @@
 interface Operation {
+    operationId: string;
     partNumber: number;
     sepNumber: number;
     description: string;

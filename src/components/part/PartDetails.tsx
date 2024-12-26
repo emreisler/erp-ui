@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {Modal, List, Button, Typography, Space, message} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
-import OperationList from "./OperationList";
+import OperationList from "../operation/OperationList";
 import useAxios from "../../utils/api";
-import AddOperationModal from "./AddOperationModal";
+import AddOperationModal from "../operation/AddOperationModal";
 import AddMaterialModal from "./AddMaterialModal";
 
 const {Title} = Typography;
@@ -122,7 +122,7 @@ const PartDetailsModal: React.FC<PartDetailsModalProps> = ({
                 bordered
             />
             <Title level={5}>Operations</Title>
-            <OperationList operations={operations} />
+            <OperationList operations={operations} onAddOperation={handleAddOperation} onUpdateOperation={handleAddOperation} />
             <Space style={{marginTop: 16}}>
                 <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
                     setIsAddOperationModalVisible(true)
