@@ -1,13 +1,14 @@
 import axios, {AxiosInstance} from "axios";
 import {useAuth} from "../hooks/Auth";
 import {message} from "antd";
+import {useNavigate} from "react-router-dom";
 
 
 let api: AxiosInstance | null = null;
 
 const useAxios = () => {
 
-    const {logout} = useAuth();
+    const navigate = useNavigate();
 
     if (api) {
         return api;
@@ -36,7 +37,9 @@ const useAxios = () => {
         (error) => {
             if (error.response) {
                 if (error.response && error.response.status === 401) {
-                    logout(); // Logout user if token is invalid or expired
+                    console.log("navigating to login")
+                    navigate("/login");
+                    return;
                 }
                 message.error(error.response.data.message || "An unexpected error occurred.");
             }

@@ -2,11 +2,10 @@ import React, {useEffect, useState} from "react";
 import {Table, Button, Typography, Space, Alert, Input, Select, Row, Col, message} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
-import AddOperationModal from "./AddOperationModal";
 import OperationList from "./OperationList";
 import CreateProductionOrderModal from "./CreateProductionOrderModal";
+import PartDetailsModal from "./PartDetails";
 
-const {Search} = Input;
 const {Option} = Select;
 
 const {Title} = Typography;
@@ -23,8 +22,6 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     const [poError, setPoError] = useState<string | null>(null);
     const [isPoModalVisible, setIsPoModalVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
-    const [taskCenters, setTaskCenters] = useState<number[]>([]);
     const [parts, setParts] = useState<Part[]>([]);
     const [partsLoading, setPartsLoading] = useState<boolean>(true);
 
@@ -36,6 +33,18 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     });
     const [filteredParts, setFilteredParts] = useState<Part[]>(parts);
 
+    const [isPartDetailsModalVisible, setIsPartDetailsModalVisible] = useState<boolean>(false);
+
+    const openPartDetailsModal = (part: Part) => {
+        setSelectedPart(part);
+        setIsPartDetailsModalVisible(true);
+    };
+
+    const closePartDetailsModal = () => {
+        setIsPartDetailsModalVisible(false);
+        setSelectedPart(null);
+    };
+
     useEffect(() => {
         const fetchParts = async () => {
             try {
@@ -44,28 +53,13 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                 setFilteredParts(response.data);
             } catch (error) {
                 message.error("Failed to fetch parts. Please try again later.");
-            }finally {
+            } finally {
                 setPartsLoading(false);
             }
         }
         fetchParts();
     }, [api, partCreated]);
 
-    useEffect(() => {
-        const fetchTaskCenters = async () => {
-            try {
-                const response = await api.get<TaskCenter[]>("/task-center");
-                const tcNumbers: number[] = [];
-                response.data.forEach((tc) => {
-                    tcNumbers.push(tc.number);
-                })
-                setTaskCenters(tcNumbers);
-            } catch (error) {
-                message.error("Failed to fetch task centers");
-            }
-        }
-        fetchTaskCenters();
-    }, [api]);
 
 
     const uniqueCategories = Array.from(new Set(parts.map((part) => part.category)));
@@ -101,21 +95,6 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
 
     const handleFilterChange = (field: keyof typeof filters, value: string) => {
         setFilters((prevFilters) => ({...prevFilters, [field]: value}));
-    };
-
-
-    const handleAddOperation = async (operation: Operation) => {
-        if (!selectedPart) return;
-        try {
-            const response = await api.put(`/part/operation/${selectedPart.number}`, operation);
-
-            if (response.status === 201) {
-                message.success("Operation successfully added");
-            }
-            console.log("Operation added successfully:", operation);
-        } catch (err) {
-            message.error("Failed to add operation. Please try again.");
-        }
     };
 
 
@@ -170,6 +149,17 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                         }}
                     >
                         Create Production Order
+                    </Button>
+                    <Button
+                        icon={<PlusOutlined />}
+                        onClick={() =>{
+                            console.log("setting up")
+                            setSelectedPart(record);
+                            setIsPartDetailsModalVisible(true);
+                            console.log("isPartDetailsModalVisible" + isPartDetailsModalVisible);
+                    }}
+                    >
+                        View Details
                     </Button>
                 </Space>
             ),
@@ -240,23 +230,20 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                     expandedRowRender: (record) => (
                         <OperationList
                             operations={record.operationList}
-                            onAddOperation={() => {
-                                setSelectedPart(record);
-                                setIsAddOperationModalVisible(true);
-                            }}
-                            onAddMaterial={() => setSelectedPart(record)}
+
+
                         />
                     ),
                 }}
                 bordered
                 pagination={{pageSize: 10}}
             />
-            <AddOperationModal
-                visible={isAddOperationModalVisible}
-                onClose={() => setIsAddOperationModalVisible(false)}
-                onAddOperation={handleAddOperation}
-                taskCenters={taskCenters}
-            />
+            {selectedPart &&             <PartDetailsModal
+                visible={isPartDetailsModalVisible}
+                onClose={closePartDetailsModal}
+                part={selectedPart}
+            />}
+
             {selectedPart && (
                 <CreateProductionOrderModal
                     visible={isPoModalVisible}

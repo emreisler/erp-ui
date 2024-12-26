@@ -20,7 +20,7 @@ const StampsList: React.FC<StampsListProps> = ({ order }) => {
         const fetchStamps = async () => {
             setLoading(true);
             try {
-                const response = await api.get(`/stamp/${order.code}`);
+                const response = await api.get(`/production-orders/stamp/${order.code}`);
                 setStamps(response.data);
             } catch (err) {
                 setError("Failed to load stamps for the selected production order.");

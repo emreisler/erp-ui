@@ -66,7 +66,12 @@ const StockList: React.FC = () => {
         if (!selectedStock) return;
 
         try {
-            const response = await api.patch<Stock>(`/stock/${selectedStock.uuid}`, {quantity: values.quantity});
+
+            const response = await api.put<Stock>(`/stock/${selectedStock.code}`,
+                {
+                    uuid : selectedStock.uuid,
+                    quantity: values.quantity,
+                });
             setStockList((prevList) =>
                 prevList.map((stock) =>
                     stock.uuid === selectedStock.uuid ? {...stock, quantity: response.data.quantity} : stock
@@ -145,7 +150,7 @@ const StockList: React.FC = () => {
     return (
         <div style={{padding: 24}}>
             <div style={{marginBottom: "16px", textAlign: "center"}}>
-                <Button type="primary" icon={<PlusOutlined/>} onClick={() => setIsCreateStockModalOpen(true)} >
+                <Button type="primary" icon={<PlusOutlined/>} onClick={() => setIsCreateStockModalOpen(true)}>
                     Create New Stock
                 </Button>
             </div>
