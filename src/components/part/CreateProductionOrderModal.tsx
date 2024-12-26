@@ -48,7 +48,7 @@ const CreateProductionOrderModal: React.FC<CreateProductionOrderModalProps> = ({
                     <Input type="number" placeholder="Enter quantity"/>
                 </Form.Item>
                 <Form.Item
-                    label="End Date"
+                    label="Required Date"
                     name="endDate"
                     rules={[{required: true, message: "Please select the end date!"}]}
                 >

@@ -6,4 +6,6 @@ interface Part {
     name: string;
     operationList: Operation[];
     stocksList: Stock[];
+    createdAt: Date | null;
+    updatedAt: Date | null;
 }

@@ -3,6 +3,7 @@ import {Table, Typography, Alert, Space, Button, Modal, List, Card, message} fro
 import useAxios from "../../utils/api";
 import {EyeOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
+import dayjs from "dayjs";
 
 const {Title} = Typography;
 
@@ -136,7 +137,7 @@ const ProductionOrderList: React.FC = () => {
         {title: "Task Center", dataIndex: "currentTaskCenter", key: "currentTaskCenter"},
         {title: "Quantity", dataIndex: "quantity", key: "quantity"},
         {title: "Status", dataIndex: "status", key: "status"},
-        {title: "End Date", dataIndex: "endDate", key: "endDate"},
+        {title: "Required Date", dataIndex: "endDate", key: "endDate", render: (text: string) => dayjs(text).format("YYYY MMM DD ")},
         {
             title: "Actions",
             key: "actions",

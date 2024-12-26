@@ -17,7 +17,7 @@ import AssemblyPage from "../assembly/AssemblyPage";
 const {Sider, Content} = Layout;
 
 const Selector: React.FC = () => {
-    const [selected, setSelected] = useState<"assembly" | "parts" | "stocks" | "prod-orders" | "task-center" | "dashboard" | "">("parts");
+    const [selected, setSelected] = useState<"assembly" | "parts" | "stocks" | "prod-orders" | "task-center" | "dashboard" | "">("assembly");
 
     const [collapsed, setCollapsed] = useState(false);
 
