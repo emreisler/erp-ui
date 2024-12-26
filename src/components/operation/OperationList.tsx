@@ -10,15 +10,13 @@ const {Text} = Typography;
 
 interface OperationListProps {
     operations: Operation[];
-    onAddOperation: (operation: Operation) => void;
-    onUpdateOperation: (updatedOperation: Operation) => void;
 }
 
-const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation, onUpdateOperation}) => {
+const OperationList: React.FC<OperationListProps> = ({operations}) => {
 
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [selectedOperation, setSelectedOperation] = useState<Operation | null>(null);
-    const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
+
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
 
     const api = useAxios();
@@ -26,7 +24,6 @@ const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation
     const handleEditSubmit = (updatedOperation: Partial<Operation>) => {
         if (selectedOperation) {
             const newOperation = {...selectedOperation, ...updatedOperation};
-            onUpdateOperation(newOperation);
         }
     };
 
@@ -47,13 +44,13 @@ const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation
     }, [api]);
 
     const sortedOperations = [...operations].sort((a, b) =>
-        a.sepNumber - b.sepNumber
+        a.stepNumber - b.stepNumber
     );
     const columns = [
         {
             title: "Step",
-            dataIndex: "sepNumber",
-            key: "sepNumber",
+            dataIndex: "stepNumber",
+            key: "stepNumber",
         },
         {
             title: "Task Center Number",
@@ -80,22 +77,8 @@ const OperationList: React.FC<OperationListProps> = ({operations, onAddOperation
                 <Text type="secondary">No operations available for this part.</Text>
             )}
             <br/>
-            <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
-                setIsAddOperationModalVisible(true)
-            }}>
-                Add Operation
-            </Button>
-            <AddOperationModal visible={isAddOperationModalVisible}
-                               onClose={() => setIsAddOperationModalVisible(false)}
-                               onAddOperation={onAddOperation}
-                               taskCenters={taskCenters}
-            />
-            <EditOperationModal
-                visible={isEditModalVisible}
-                operation={selectedOperation}
-                onClose={() => setIsEditModalVisible(false)}
-                onSubmit={handleEditSubmit}
-            />
+
+
             <br/>
         </div>
     );

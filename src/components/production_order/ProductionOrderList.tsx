@@ -29,7 +29,7 @@ const ProductionOrderList: React.FC = () => {
         try {
             const stamp: Stamp = {
                 productionOrderCode: selectedOrder.code,
-                stepNumber: operation.sepNumber,
+                stepNumber: operation.stepNumber,
                 userEmail: operation.userEmail || "example@example.com",
             };
 
@@ -45,11 +45,11 @@ const ProductionOrderList: React.FC = () => {
 
             setOperations((prevOperations) =>
                 prevOperations.map((op) =>
-                    op.sepNumber === operation.sepNumber ? {...op, isStamped: true} : op
+                    op.stepNumber === operation.stepNumber ? {...op, isStamped: true} : op
                 )
             );
 
-            message.success(`Operation ${operation.sepNumber} stamped successfully.`);
+            message.success(`Operation ${operation.stepNumber} stamped successfully.`);
         } catch (error) {
             message.error("Failed to stamp the operation. Please try again.");
         }
@@ -79,7 +79,7 @@ const ProductionOrderList: React.FC = () => {
     useEffect(() => {
         setOperations((prevOperations) =>
             prevOperations.map((operation) => {
-                const matchingStamp = stamps.find((stamp) => stamp.stepNumber === operation.sepNumber);
+                const matchingStamp = stamps.find((stamp) => stamp.stepNumber === operation.stepNumber);
                 return {
                     ...operation,
                     isStamped: Boolean(matchingStamp),
@@ -189,7 +189,7 @@ const ProductionOrderList: React.FC = () => {
                             >
                                 {/* Compact horizontal layout */}
                                 <div style={{display: "flex", gap: "20px", flexWrap: "wrap"}}>
-                                    <span><strong>Step:</strong> {operation.sepNumber}</span>
+                                    <span><strong>Step:</strong> {operation.stepNumber}</span>
                                     <span><strong>User:</strong> {operation.userEmail || "N/A"}</span>
                                     <span><strong>Order Code:</strong> {operation.taskCenterNo}</span>
                                     <span><strong>Description:</strong> {operation.description || "No description available"}</span>

@@ -7,7 +7,7 @@ const {Text} = Typography;
 
 
 interface AttachedPartList {
-    selectedAssembly: Assembly;
+    attachedParts : AttachPartModalState[]
 }
 
 function EditOutlined() {
@@ -18,27 +18,8 @@ function DeleteOutlined() {
     return null;
 }
 
-const AttachedPartList: React.FC<AttachedPartList> = ({selectedAssembly}) => {
-    const api = useAxios();
-    const [loading, setLoading] = useState(false);
-    const [attachedParts, setAttachedParts] = useState<AttachPartModalState[]>([]);
+const AttachedPartList: React.FC<AttachedPartList> = ({attachedParts}) => {
 
-    useEffect(() => {
-        if (selectedAssembly) {
-            const fetchAttachedParts = async () => {
-                setLoading(true);
-                try {
-                    const response = await api.get<AttachPartModalState[]>(`/assembly/part/${selectedAssembly.number}`);
-                    setAttachedParts(response.data);
-                } catch (error) {
-                    message.error("Failed to fetch operations.");
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchAttachedParts();
-        }
-    }, [selectedAssembly, api]);
 
     const handleEdit = (attachedPart : AttachPartModalState) => {
         console.log("edit");
@@ -88,7 +69,6 @@ const AttachedPartList: React.FC<AttachedPartList> = ({selectedAssembly}) => {
                     columns={columns}
                     rowKey={(attachedPart: AttachPartModalState) => `${attachedPart.partNumber}-${attachedPart.quantity}`}
                     pagination={false}
-                    loading={loading}
                 />
             ) : (
                 <Text type="secondary">No attached part available for this part.</Text>

@@ -46,7 +46,7 @@ const EditOperationModal: React.FC<EditOperationModalProps> = ({
                 >
                     <Form.Item
                         label="Step"
-                        name="sepNumber"
+                        name="stepNumber"
                         rules={[{ required: true, message: "Please input the step number!" }]}
                     >
                         <Input type="number" />

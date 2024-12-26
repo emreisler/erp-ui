@@ -49,7 +49,7 @@ const AddOperationModal: React.FC<AddOperationModalProps> = ({
             >
                 <Form.Item
                     label="Step Number"
-                    name="sepNumber"
+                    name="stepNumber"
                     rules={[{ required: true, message: "Please input the step number!" }]}
                 >
                     <Input type="number" placeholder="Enter step number" />

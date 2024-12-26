@@ -38,7 +38,7 @@ const AttachedMaterialList: React.FC<AttachedMaterialListProps> = ({attachedMate
                     pagination={false}
                 />
             ) : (
-                <Text type="secondary">No operations available for this part.</Text>
+                <Text type="secondary">No materials available for this part.</Text>
             )}
             <br/>
         </div>
