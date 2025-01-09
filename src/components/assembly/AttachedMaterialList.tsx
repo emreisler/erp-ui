@@ -1,5 +1,6 @@
 import React from "react";
-import {Table, Typography, Button} from "antd";
+import {Table, Typography, Button, Space} from "antd";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 
@@ -9,6 +10,14 @@ interface AttachedMaterialListProps {
 }
 
 const AttachedMaterialList: React.FC<AttachedMaterialListProps> = ({attachedMaterials}) => {
+
+    function handleEdit(record: AttachedStockModalState) {
+        
+    }
+
+    function handleDelete(record: AttachedStockModalState) {
+        
+    }
 
     const columns = [
         {
@@ -25,6 +34,25 @@ const AttachedMaterialList: React.FC<AttachedMaterialListProps> = ({attachedMate
             title: "Quantity",
             dataIndex: "quantity",
             key: "quantity",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: AttachedStockModalState) => (
+                <Space>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(record)}
+                    />
+                    <Button
+                        type="primary"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record)}
+                    />
+                </Space>
+            ),
         },
     ];
 

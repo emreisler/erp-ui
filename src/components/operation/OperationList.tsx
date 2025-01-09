@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
-import {Table, Typography, Button, message} from "antd";
+import {Table, Typography, Button, message, Space} from "antd";
 import EditOperationModal from "./EditOperationModal";
-import {PlusOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import AddOperationModal from "./AddOperationModal";
 import useAxios from "../../utils/api";
 
@@ -46,6 +46,15 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
     const sortedOperations = [...operations].sort((a, b) =>
         a.stepNumber - b.stepNumber
     );
+
+    function handleEdit(record: Operation) {
+        
+    }
+
+    function handleDelete(record: Operation) {
+        
+    }
+
     const columns = [
         {
             title: "Step",
@@ -61,6 +70,25 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
             title: "Description",
             dataIndex: "description",
             key: "description",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_: any, record: Operation) => (
+                <Space>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(record)}
+                    />
+                    <Button
+                        type="primary"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record)}
+                    />
+                </Space>
+            ),
         },
     ];
 

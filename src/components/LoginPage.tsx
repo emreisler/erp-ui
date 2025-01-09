@@ -56,17 +56,15 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
     };
 
     return (
-        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px"}}>
+        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px", textAlign: "center"}}>
 
-            <Title level={2} style={{textAlign: "center"}}>
-                Login
-            </Title>
+
             {error && <Alert message={error} type="error" showIcon style={{marginBottom: 16}}/>}
             <Form
                 layout="vertical"
                 onFinish={handleLogin}
                 initialValues={{
-                    email: "admin@example.com",
+                    email: "admin@erplite.com",
                     password: "admin123",
                 }}
             >

@@ -10,7 +10,7 @@ const UserMenu: React.FC = () => {
 
     const handleLogout = () => {
         // Clear user-related data (e.g., tokens)
-        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
         setAuthToken(null);
         message.success("Logged out successfully.");
         console.log("Logged out successfully.");

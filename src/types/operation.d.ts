@@ -6,4 +6,5 @@ interface Operation {
     taskCenterNo: string;
     isStamped: boolean;
     userEmail : string;
+    status: string;
 }

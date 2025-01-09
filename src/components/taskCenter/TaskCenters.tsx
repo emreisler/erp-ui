@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Button, Typography, Table, Modal, Space, Tag, Input, Row, Col, message} from "antd";
-import { PlusOutlined, CheckCircleOutlined, ToolOutlined } from "@ant-design/icons";
+import {PlusOutlined, CheckCircleOutlined, ToolOutlined, EditOutlined, DeleteOutlined} from "@ant-design/icons";
 import useAxios from "../../utils/api";
 import TaskCenterForm from "./TaskCenterForm";
 
@@ -117,12 +117,17 @@ const TaskCenters: React.FC = () => {
             key: "actions",
             render: (_: any, record: TaskCenter) => (
                 <Space>
-                    <Button type="link" onClick={() => openUpdateModal(record)}>
-                        Edit
-                    </Button>
-                    <Button type="link" danger onClick={() => handleDelete(record.uuid)}>
-                        Delete
-                    </Button>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => openUpdateModal(record)}
+                    />
+                    <Button
+                        type="primary"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record.number)}
+                    />
                 </Space>
             ),
         },

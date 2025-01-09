@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from "react";
 import {Table, Typography, Alert, Space, Button, Modal, List, Card, message} from "antd";
 import useAxios from "../../utils/api";
-import {EyeOutlined} from "@ant-design/icons";
+import {EyeOutlined,CheckCircleTwoTone} from "@ant-design/icons";
 import {useNavigate} from "react-router-dom";
 import dayjs from "dayjs";
+import OperationCard from "./OperationCard";
+import StampButton from "./StampButton";
 
 const {Title} = Typography;
+
+function ArrowRightOutlined(props: { style: { color: string; fontSize: string } }) {
+    return null;
+}
 
 const ProductionOrderList: React.FC = () => {
     console.log("ProductionOrderList rendered");
@@ -31,7 +37,7 @@ const ProductionOrderList: React.FC = () => {
             const stamp: Stamp = {
                 productionOrderCode: selectedOrder.code,
                 stepNumber: operation.stepNumber,
-                userEmail: operation.userEmail || "example@example.com",
+                userEmail: operation.userEmail || "admin@erplite.com",
             };
 
             const response = await api.put("/production-orders/stamp", stamp);
@@ -133,6 +139,7 @@ const ProductionOrderList: React.FC = () => {
     const columns = [
         {title: "Order Code", dataIndex: "code", key: "code"},
         {title: "Part Number", dataIndex: "partNumber", key: "partNumber"},
+        {title: "Assembly Number", dataIndex: "assemblyNumber", key: "assemblyNumber"},
         {title: "Step", dataIndex: "currentStep", key: "currentStep"},
         {title: "Task Center", dataIndex: "currentTaskCenter", key: "currentTaskCenter"},
         {title: "Quantity", dataIndex: "quantity", key: "quantity"},
@@ -177,45 +184,30 @@ const ProductionOrderList: React.FC = () => {
                     <List
                         grid={{gutter: 16, column: 1}}
                         dataSource={operations}
-                        renderItem={(operation) => (
+                        renderItem={(operation : Operation, index: number) => (
                             <List.Item
                                 style={{
-                                    backgroundColor: operation.isStamped ? "#d9f7be" : "transparent", // Light green background
-                                    padding: "10px",
+                                    // backgroundColor: operation.isStamped ? "limegreen" : "deepskyblue", // Light green background
+                                    padding: "20px",
                                     borderRadius: "5px",
                                     display: "flex",
+                                    border: "1px solid #ecf0f1",
                                     justifyContent: "space-between",
                                     alignItems: "center",
                                 }}
                             >
                                 {/* Compact horizontal layout */}
-                                <div style={{display: "flex", gap: "20px", flexWrap: "wrap"}}>
-                                    <span><strong>Step:</strong> {operation.stepNumber}</span>
-                                    <span><strong>User:</strong> {operation.userEmail || "N/A"}</span>
-                                    <span><strong>Order Code:</strong> {operation.taskCenterNo}</span>
-                                    <span><strong>Description:</strong> {operation.description || "No description available"}</span>
-                                </div>
+                                <OperationCard operation={operation} />
+                                {index < operations.length - 1 && (
+                                    <ArrowRightOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+                                )}
                                 {/* Actions */}
                                 <div>
-                                    {!operation.isStamped && (
-                                        <Button
-                                            type="primary"
-                                            onClick={() => handleStampOperation(operation, selectedOrder)}
-                                            style={{marginRight: "10px"}}
-                                        >
-                                            Stamp
-                                        </Button>
-                                    )}
-                                    <Button
-                                        type="link"
-                                        onClick={() =>
-                                            message.info(
-                                                `Details: ${operation.description || "No description available."}`
-                                            )
-                                        }
-                                    >
-                                        View Details
-                                    </Button>
+                                    <StampButton isStamped={operation.isStamped} onStampClick={() => handleStampOperation(operation, selectedOrder)} onViewDetails={() =>
+                                        message.info(
+                                            `Details: ${operation.description || "No description available."}`
+                                        )}/>
+
                                 </div>
                             </List.Item>
                         )}

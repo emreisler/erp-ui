@@ -1,21 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {Table, Typography, Button, message, Space} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
-import useAxios from "../../utils/api";
+import {EditOutlined, DeleteOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 
 
 interface AttachedPartList {
     attachedParts : AttachPartModalState[]
-}
-
-function EditOutlined() {
-    return null;
-}
-
-function DeleteOutlined() {
-    return null;
 }
 
 const AttachedPartList: React.FC<AttachedPartList> = ({attachedParts}) => {

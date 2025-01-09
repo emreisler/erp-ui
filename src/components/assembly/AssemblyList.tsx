@@ -177,8 +177,8 @@ const AssemblyList: React.FC<AssemblyListProps> = ({assemblyCreated}) => {
     const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
         setLoading(true);
         try {
-            await api.post("/production-orders", {
-                partNo: partNumber,
+            await api.post("/production-orders/assembly", {
+                assemblyNo: partNumber,
                 quantity,
                 endDate,
             });

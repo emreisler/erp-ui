@@ -1,7 +1,20 @@
 import React, {useEffect, useState} from "react";
-import {Table, Typography, Spin, message, Button, Modal, Form, InputNumber, Popconfirm, Select, Input} from "antd";
+import {
+    Table,
+    Typography,
+    Spin,
+    message,
+    Button,
+    Modal,
+    Form,
+    InputNumber,
+    Popconfirm,
+    Select,
+    Input,
+    Space
+} from "antd";
 import useAxios from "../../utils/api";
-import {PlusOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 
 const {Title} = Typography;
 
@@ -61,6 +74,7 @@ const StockList: React.FC = () => {
             message.error("Failed to delete stock. Please try again.");
         }
     };
+
 
     const handleUpdateQuantity = async (values: { quantity: number }) => {
         if (!selectedStock) return;
@@ -122,27 +136,19 @@ const StockList: React.FC = () => {
             title: "Actions",
             key: "actions",
             render: (_: any, record: Stock) => (
-                <div>
+                <Space>
                     <Button
-                        type="link"
-                        onClick={() => {
-                            setSelectedStock(record);
-                            setIsModalOpen(true);
-                        }}
-                    >
-                        Update Quantity
-                    </Button>
-                    <Popconfirm
-                        title="Are you sure to delete this stock?"
-                        onConfirm={() => handleDeleteStock(record.code)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button type="link" danger>
-                            Delete
-                        </Button>
-                    </Popconfirm>
-                </div>
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => handleUpdateQuantity({ quantity: record.quantity })}
+                    />
+                    <Button
+                        type="primary"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteStock(record.code)}
+                    />
+                </Space>
             ),
         },
     ];

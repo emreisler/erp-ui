@@ -79,7 +79,7 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
         setLoading(true);
         try {
-            await api.post("/production-orders", {
+            await api.post("/production-orders/part", {
                 partNo: partNumber,
                 quantity,
                 endDate,
