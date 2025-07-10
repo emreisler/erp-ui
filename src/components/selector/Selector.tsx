@@ -16,6 +16,7 @@ import TaskCenterList from "../taskCenter/TaskCenters";
 import StockList from "../stock/StockList";
 import UserMenu from "../UserMenu";
 import AssemblyPage from "../assembly/AssemblyPage";
+import TcMetrics from "../dashboard/TcMetrics";
 import Dashboard from "../dashboard/Dashboard";
 
 const {Sider, Content} = Layout;

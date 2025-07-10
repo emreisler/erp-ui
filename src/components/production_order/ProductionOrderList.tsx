@@ -198,8 +198,12 @@ const ProductionOrderList: React.FC = () => {
                             >
                                 {/* Compact horizontal layout */}
                                 <OperationCard operation={operation} />
+                                {/* Arrow Between Cards */}
+                                {/* Center: Arrow */}
                                 {index < operations.length - 1 && (
-                                    <ArrowRightOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        <ArrowRightOutlined style={{ fontSize: "24px", color: "#1890ff" }} />
+                                    </div>
                                 )}
                                 {/* Actions */}
                                 <div>

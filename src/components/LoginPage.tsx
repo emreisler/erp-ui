@@ -56,7 +56,7 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
     };
 
     return (
-        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px", textAlign: "center"}}>
+        <div style={{maxWidth: "400px", margin: "0 auto", padding: "20px", marginTop : "200px", textAlign: "center"}}>
 
 
             {error && <Alert message={error} type="error" showIcon style={{marginBottom: 16}}/>}

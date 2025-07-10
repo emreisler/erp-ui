@@ -23,7 +23,6 @@ const StampButton: React.FC<{
             ) : (
                 <Button
                     icon={<EditOutlined />}
-                    type="primary"
                     onClick={onStampClick}
                     style={{ cursor: "default", fontWeight: "bold", marginRight: 10, marginLeft: 10 }}
                 >

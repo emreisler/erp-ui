@@ -210,6 +210,7 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                         </Tabs>
                     ),
                 }}
+                rowClassName={() => "hover-row"}
                 bordered
                 pagination={{pageSize: 10}}
             />
