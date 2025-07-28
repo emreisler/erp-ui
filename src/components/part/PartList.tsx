@@ -9,6 +9,8 @@ import AttachedMaterialList from "../assembly/AttachedMaterialList";
 import AttachedPartList from "../assembly/AttachedPartList";
 import AddOperationModal from "../operation/AddOperationModal";
 import AddMaterialModal from "./AddMaterialModal";
+import EditOperationModal from "../operation/EditOperationModal";
+import assemblyList from "../assembly/AssemblyList";
 
 const {Option} = Select;
 
@@ -23,7 +25,9 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     console.log("port list rendered")
     const api = useAxios();
     const [selectedPart, setSelectedPart] = useState<Part | null>(null);
+    const [selectedOperation, setSelectedOperation] = useState<Operation | null>(null);
     const [isAddOperationModalVisible, setIsAddOperationModalVisible] = useState<boolean>(false);
+
     const [isAddMaterialModalVisible, setIsAddMaterialModalVisible] = useState<boolean>(false);
     const [operations, setOperations] = useState<Operation[]>([])
     const [materials, setMaterials] = useState<AttachedStockModalState[]>([]);
@@ -73,9 +77,6 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
     }, [api, partCreated]);
 
 
-
-
-
     const handleCreateProductionOrder = async (partNumber: string, quantity: number, endDate: string) => {
         setLoading(true);
         try {
@@ -109,6 +110,12 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
             console.log("err:", err)
         }
     };
+
+
+
+    function handleDelete(record: Operation) {
+
+    }
 
     const handleAddMaterial = async (stock: Stock) => {
         if (!selectedPart) return;
@@ -220,6 +227,7 @@ const PartList: React.FC<PartListProps> = ({partCreated}) => {
                 onAddOperation={handleAddOperation}
                 taskCenters={taskCenters}
             />
+
             <AddMaterialModal
                 visible={isAddMaterialModalVisible}
                 onClose={() => setIsAddMaterialModalVisible(false)}

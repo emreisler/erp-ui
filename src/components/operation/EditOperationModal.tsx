@@ -1,11 +1,11 @@
 import React from "react";
-import { Modal, Form, Input, Button } from "antd";
+import {Modal, Form, Input, Button} from "antd";
 
 interface EditOperationModalProps {
     visible: boolean;
     operation: Operation | null; // Pass the selected operation
     onClose: () => void; // Close modal callback
-    onSubmit: (updatedOperation: Partial<Operation>) => void; // Submit updated operation callback
+    onSubmit: (operation: Operation) => void; // Submit updated operation callback
 }
 
 const EditOperationModal: React.FC<EditOperationModalProps> = ({
@@ -25,7 +25,7 @@ const EditOperationModal: React.FC<EditOperationModalProps> = ({
         }
     }, [operation, form]);
 
-    const handleFinish = (values: Partial<Operation>) => {
+    const handleFinish = async (values: Operation) => {
         onSubmit(values);
         onClose();
     };
@@ -47,23 +47,23 @@ const EditOperationModal: React.FC<EditOperationModalProps> = ({
                     <Form.Item
                         label="Step"
                         name="stepNumber"
-                        rules={[{ required: true, message: "Please input the step number!" }]}
+                        rules={[{required: true, message: "Please input the step number!"}]}
                     >
-                        <Input type="number" />
+                        <Input type="number"/>
                     </Form.Item>
                     <Form.Item
                         label="Task Center Number"
                         name="taskCenterNo"
-                        rules={[{ required: true, message: "Please input the task center number!" }]}
+                        rules={[{required: true, message: "Please input the task center number!"}]}
                     >
-                        <Input type="number" />
+                        <Input type="number"/>
                     </Form.Item>
                     <Form.Item
                         label="Description"
                         name="description"
-                        rules={[{ required: true, message: "Please input the description!" }]}
+                        rules={[{required: true, message: "Please input the description!"}]}
                     >
-                        <Input />
+                        <Input/>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">

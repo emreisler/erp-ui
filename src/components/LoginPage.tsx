@@ -64,8 +64,8 @@ const LoginPage: React.FC<Props> = ({ setAuthToken }) => {
                 layout="vertical"
                 onFinish={handleLogin}
                 initialValues={{
-                    email: "admin@erplite.com",
-                    password: "admin123",
+                    email: "",
+                    password: "",
                 }}
             >
                 <Form.Item

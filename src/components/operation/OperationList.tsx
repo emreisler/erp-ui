@@ -13,9 +13,11 @@ interface OperationListProps {
 }
 
 const OperationList: React.FC<OperationListProps> = ({operations}) => {
+    console.log("full ops : ", operations);
 
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [selectedOperation, setSelectedOperation] = useState<Operation | null>(null);
+    const [isEditOperationModalVisible, setIsEditOperationModalVisible] = useState<boolean>(false);
 
     const [taskCenters, setTaskCenters] = useState<number[]>([]);
 
@@ -47,12 +49,32 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
         a.stepNumber - b.stepNumber
     );
 
-    function handleEdit(record: Operation) {
-        
+    const handleEditOperation = async (updatedFields: Partial<Operation>) => {
+        if (!selectedOperation) return;
+        console.log("updated operation", updatedFields);
+
+        const fullOperation: Operation = {
+            ...selectedOperation,
+            ...updatedFields,
+        };
+        console.log("operation", fullOperation);
+
+        try {
+            const response = await api.put(`/part/operation/${fullOperation.operationId}:update`, fullOperation);
+
+            if (response.status === 201) {
+                message.success("Operation successfully added");
+            }
+            console.log("Operation added successfully:", fullOperation);
+        } catch (err) {
+            message.error("Failed to add operation. Please try again.");
+            console.log("err:", err)
+        }
+
     }
 
     function handleDelete(record: Operation) {
-        
+
     }
 
     const columns = [
@@ -78,13 +100,16 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
                 <Space>
                     <Button
                         type="primary"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
+                        icon={<EditOutlined/>}
+                        onClick={() => {
+                            setSelectedOperation(record);
+                            setIsEditOperationModalVisible(true);
+                        }}
                     />
                     <Button
                         type="primary"
                         danger
-                        icon={<DeleteOutlined />}
+                        icon={<DeleteOutlined/>}
                         onClick={() => handleDelete(record)}
                     />
                 </Space>
@@ -108,6 +133,13 @@ const OperationList: React.FC<OperationListProps> = ({operations}) => {
 
 
             <br/>
+            <EditOperationModal
+                visible={isEditOperationModalVisible}
+                operation={selectedOperation}
+                onClose={() => {
+                    setIsEditOperationModalVisible(false)
+                }}
+                onSubmit={handleEditOperation}/>
         </div>
     );
 };

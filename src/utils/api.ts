@@ -14,7 +14,7 @@ const useAxios = () => {
         return api;
     }
     api = axios.create({
-        baseURL: "http://localhost:8080/v1",
+        baseURL: "http://217.76.56.9/v1",
     });
 
     api.interceptors.request.use(
