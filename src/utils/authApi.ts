@@ -10,7 +10,8 @@ const useAuthAxios = () => {
         return authApi;
     }
     authApi = axios.create({
-        baseURL: "http://217.76.56.9/v1",
+        baseURL: "http://217.76.56.9/api/v1",
+        // baseURL: "http://localhost:8080/v1",
     });
 
     authApi.interceptors.request.use(
