@@ -16,8 +16,6 @@ import TaskCenterList from "../taskCenter/TaskCenters";
 import StockList from "../stock/StockList";
 import UserMenu from "../UserMenu";
 import AssemblyPage from "../assembly/AssemblyPage";
-import TcMetrics from "../dashboard/TcMetrics";
-import Dashboard from "../dashboard/Dashboard";
 
 const {Sider, Content} = Layout;
 
@@ -43,7 +41,7 @@ const Selector: React.FC = () => {
             case "task-center":
                 return <TaskCenterList/>;
             case "dashboard":
-                return <Dashboard/>;
+                return <div></div>;
 
 
             default:

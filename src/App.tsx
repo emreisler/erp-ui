@@ -20,7 +20,7 @@ const App: React.FC = () => {
     return (
         <AuthProvider>
 
-            <Router>
+            <Router basename="/ui">
                 <Routes>
                     <Route path="/" element={<Navigate to="/login" replace/>}/>
                     <Route

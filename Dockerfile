@@ -17,8 +17,8 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy built React files from builder
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Optional: Custom Nginx config (see below)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# ✅ Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
